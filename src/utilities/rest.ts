@@ -1,4 +1,5 @@
 import Config from '../config.json' assert { type: 'json' };
+import { Routes } from 'discord-api-types/v10';
 
 export class REST {
     private globalRateLimit = false;
@@ -11,37 +12,37 @@ export class REST {
 
     constructor(private config: typeof Config) { }
 
-    async get(route: string) {
-        return await this.fetch(this.API + route, {
+    public async get<T = Record<any, any>>(route: string): Promise<T | null> {
+        return this.fetch(this.API + route, {
             method: "GET",
             headers: this.auth
         });
     }
 
-    async post(route: string, body: any) {
-        return await this.fetch(this.API + route, {
+    public async post(route: string, body: any) {
+        return this.fetch(this.API + route, {
             method: "POST",
             headers: this.auth,
             body: JSON.stringify(body)
         });
     }
 
-    async patch(route: string, body: any) {
-        return await this.fetch(this.API + route, {
+    public async patch(route: string, body: any) {
+        return this.fetch(this.API + route, {
             method: "PATCH",
             headers: this.auth,
             body: JSON.stringify(body)
         });
     }
 
-    async delete(route: string) {
-        return await this.fetch(this.API + route, {
+    public async delete(route: string) {
+        return this.fetch(this.API + route, {
             method: "DELETE",
             headers: this.auth
         });
     }
 
-    async fetch(endpoint: string, data: object) {
+    private async fetch(endpoint: string, data: object) {
         if (this.globalRateLimit && Date.now() < this.globalRateLimitReset) {
             const delay = this.globalRateLimitReset - Date.now();
 
@@ -79,6 +80,8 @@ export class REST {
             this.globalRateLimitReset = parseInt(response.headers.get("retry-after") as string) + Date.now();
         }
     
-        return response;
+        if (response.status !== 200) return null;
+
+        return response.json() as Promise<Record<any, any>>;
       }
 }

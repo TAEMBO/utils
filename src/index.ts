@@ -1,15 +1,10 @@
-import Client from './client.js'
-import { BaseInteraction } from './utilities.js';
+import Client from './client.js';
+import config from './config.json' assert { type: "json" };
+import * as d_types from 'discord-api-types/v10';
 
-const client = new Client();
+d_types.Routes
 
-client.on("interaction", async (interaction: BaseInteraction) => {
-    if (!interaction.isChatInputCommand()) return;
+config
+const client = new Client({ ...config, port: 5600, hostname: "0.0.0.0" });
 
-    const cmd = client.commands.get(interaction.commandName);
-    
-    if(!cmd) return;
-
-    cmd.execute(interaction);
-});
 process.on("uncaughtException", console.log);

@@ -1,4 +1,4 @@
-import { APIEmbed } from "discord-api-types/v10";
+import { APIEmbed, APIMessage } from "discord-api-types/v10";
 import { User } from "./User.js";
 
 export class Message {
@@ -15,7 +15,7 @@ export class Message {
     mentionEveryone: boolean;
     tts: boolean;
 
-    constructor(data: any) {
+    constructor(data: APIMessage) {
         this.id = data.id;
         this.type = data.type;
         this.content = data.content;

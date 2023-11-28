@@ -1,10 +1,11 @@
-import { ApplicationCommandOptionType } from "discord-api-types/v10";
+import { APIRole, APIUser, ApplicationCommandOptionType, APIInteractionDataResolvedChannelBase, ChannelType } from "discord-api-types/v10";
 import { ChatInputCommandInteraction } from "../interactions/ChatInputCommandInteraction.js";
+import { Collection } from "@discordjs/collection";
 
 export class ChatInputCommandInteractionOptions {
     public subcommand: string | null = null;
     public group: string | null = null;
-    private _options = new Map<string, any>();
+    private _options = new Collection<string, string | number | boolean | APIRole | APIUser | APIInteractionDataResolvedChannelBase<ChannelType>>();
     
     constructor(public interactionData: ChatInputCommandInteraction) {
         const { body } = interactionData.req;
@@ -93,10 +94,22 @@ export class ChatInputCommandInteractionOptions {
                 });
             }
         } */
+
+        console.log(this._options);
     }
+
     get(name: string) {
         return this._options.get(name);
     }
+
+    getString(name: string) {
+        return this._options.find((value, key) => typeof value === 'string' && key === name) as string | undefined ?? null;
+    }
+
+    getBoolean(name: string) {
+        return this._options.find((value, key) => typeof value === 'string' && key === name) as string | undefined ?? null;
+    }
+
     first() {
         return this._options.values().next().value;
     }

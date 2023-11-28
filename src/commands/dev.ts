@@ -14,5 +14,11 @@ export default {
     data: new SlashCommandBuilder()
         .setName('dev')
         .setDescription('sus')
-        .addSubcommand(x => x.setName('user'))
+        .addSubcommand(x => x
+            .setName('eval')
+            .setDescription('Evaluate code')
+            .addStringOption(x => x
+                .setName('code')
+                .setDescription('The code to evaluate')
+                .setRequired(true)))
 };

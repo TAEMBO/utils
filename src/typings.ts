@@ -6,6 +6,15 @@ export interface CollectorOptions {
     filter?: (int: BaseInteraction) => any;
     max?: number;
     timeout?: number;
+};
+
+export interface Options {
+    token: string;
+    publicKey: string;
+    id: string;
+    port: number;
+    hostname: string;
+
 }
 
 export type ChatInputCommandInteractionOption = ChatInputCommandInteractionOptionBase &
