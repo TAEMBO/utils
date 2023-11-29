@@ -4,13 +4,14 @@ import { InteractionResponseType, verifyKeyMiddleware } from "discord-interactio
 import { EventEmitter } from "node:events";
 import { GuildMember, BaseInteraction, User, ChatInputCommandInteraction } from "./utilities.js";
 import config from './config.json' assert { type: 'json' };
-import { REST } from "./utilities/rest.js";
+import {  } from "./utilities/rest.js";
+import { REST } from "@discordjs/rest";
 import { Options, MessagePayLoad, TypedRequest } from "./typings.js";
 import { APIEmbed, APIInteraction, APIMessage, InteractionType, ApplicationCommandType, ComponentType, Routes, APIUser, APIGuildMember, APIGuild, APIChannel } from "discord-api-types/v10";
 
 export default class Client extends EventEmitter {
     webserver = express();
-    rest = new REST(this.config);
+    rest = new REST().setToken(this.config.token);
     users = new Map<string, User>();
     members = new Map<string, GuildMember>();
     guilds = new Map<string, any>();
@@ -60,31 +61,37 @@ export default class Client extends EventEmitter {
     }
 
     async sendDm(userId: string, data: MessagePayLoad) {
-        const dmFetch = await this.rest.post("/users/@me/channels", {
-            recipient_id: userId,
-        });
+        const dmFetch = await this.rest.post(Routes.userChannels(), {
+            body: {
+                recipient_id: userId
+            }
+        }) as Record<any, any>;
 
         if (!dmFetch) return null;
 
-        return this.rest.post(`/channels/${dmFetch.id}/messages`, {
-            content: data.content ? data.content : "",
-            embeds: data.embeds?.map(x => x),
-            components: data.components?.map((component) => (this.isJSON(component) ? component : component.toJSON())),
-            attachments: data.files?.map((file, index) => ({ id: index.toString(), description: file.description })),
+        return this.rest.post(Routes.channelMessages(dmFetch.id), {
+            body: {
+                content: data.content ? data.content : "",
+                embeds: data.embeds?.map(x => x),
+                components: data.components?.map((component) => (this.isJSON(component) ? component : component.toJSON())),
+                attachments: data.files?.map((file, index) => ({ id: index.toString(), description: file.description })),
+            }
         });
     }
 
     async send(channelId: string, data: MessagePayLoad) {
-        return this.rest.post(`/channels/${channelId}/messages`, {
-            content: data.content ? data.content : "",
-            embeds: data.embeds?.map(x => x),
-            components: data.components?.map((component) => (this.isJSON(component) ? component : component.toJSON())),
-            attachments: data.files?.map((file, index) => ({ id: index.toString(), description: file.description })),
+        return this.rest.post(Routes.channelMessages(channelId), {
+            body: {
+                content: data.content ? data.content : "",
+                embeds: data.embeds?.map(x => x),
+                components: data.components?.map((component) => (this.isJSON(component) ? component : component.toJSON())),
+                attachments: data.files?.map((file, index) => ({ id: index.toString(), description: file.description })),
+            }
         });
     }
 
     async getMsg(channelId: string, messageId: string) {
-        return this.rest.get<APIMessage>(`/channels/${channelId}/messages/${messageId}`);
+        return this.rest.get(Routes.channelMessage(channelId, messageId)) as Promise<APIMessage>;
     }
 
     async getUser(userId: string) {
@@ -92,7 +99,7 @@ export default class Client extends EventEmitter {
 
         if (cachedUser) return cachedUser;
 
-        const response = await this.rest.get<APIUser>(`/users/${userId}`);
+        const response = await this.rest.get(Routes.user(userId)) as APIUser;
 
         if (!response) return null;
 
@@ -108,7 +115,7 @@ export default class Client extends EventEmitter {
 
         if (cachedMember) return cachedMember;
 
-        const response = await this.rest.get<APIGuildMember>(`/guilds/${guildId}/members/${userId}`);
+        const response = await this.rest.get(Routes.guildMember(guildId, userId)) as APIGuildMember;
 
         if (!response) return null;
 
@@ -124,7 +131,7 @@ export default class Client extends EventEmitter {
 
         if (guildCache) return guildCache;
 
-        const response = await this.rest.get<APIGuild>(`/guilds/${guildId}`);
+        const response = await this.rest.get(Routes.guild(guildId)) as APIGuild;
 
         if (!response) return null;
 
@@ -138,7 +145,7 @@ export default class Client extends EventEmitter {
 
         if (channelCache) return channelCache;
 
-        const response = await this.rest.get<APIChannel>(`/channels/${channelId}`);
+        const response = await this.rest.get(Routes.channel(channelId)) as APIChannel;
 
         if (!response) return null;
 
@@ -148,7 +155,7 @@ export default class Client extends EventEmitter {
     }
 
     async getChannels(guildId: string) {
-        return this.rest.get(`/guilds/${guildId}/channels`);
+        return this.rest.get(Routes.guildChannels(guildId));
     }
 
     isJSON(data: any) {

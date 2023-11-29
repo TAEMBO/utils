@@ -1,5 +1,5 @@
 import { InteractionResponseFlags, InteractionType } from "discord-interactions";
-import { APIEmbed } from "discord-api-types/v10";
+import { APIEmbed, APIMessage, Routes } from "discord-api-types/v10";
 import { Request , Response } from "express";
 import Client from "../client.js";
 import { CollectorOptions } from "../typings.js";
@@ -51,9 +51,9 @@ export class BaseInteraction {
         data.flags = data.ephemeral ? InteractionResponseFlags.EPHEMERAL : null;
 
         this.res.send({ type, data });
-        const replyData = await this.client.rest.get(`/webhooks/${this.client.config.id}/${this.token}/messages/@original`);
+        const replyData = await this.client.rest.get(Routes.webhookMessage(this.client.config.id, this.token)) as APIMessage;
         
-        return new Message(await replyData.json());
+        return new Message(replyData);
     }
     async editReply(data: ReplyOptions) {
         const replyData = await (await fetch(`https://discord.com/api/webhooks/${this.client.config.id}/${this.token}/messages/@original`, {
