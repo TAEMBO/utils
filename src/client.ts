@@ -8,15 +8,16 @@ import {  } from "./utilities/rest.js";
 import { REST } from "@discordjs/rest";
 import { Options, MessagePayLoad, TypedRequest } from "./typings.js";
 import { APIEmbed, APIInteraction, APIMessage, InteractionType, ApplicationCommandType, ComponentType, Routes, APIUser, APIGuildMember, APIGuild, APIChannel } from "discord-api-types/v10";
+import { Collection } from "@discordjs/collection";
 
 export default class Client extends EventEmitter {
     webserver = express();
     rest = new REST().setToken(this.config.token);
-    users = new Map<string, User>();
-    members = new Map<string, GuildMember>();
-    guilds = new Map<string, any>();
-    commands = new Map<string, any>();
-    channels = new Map<string, any>();
+    users = new Collection<string, User>();
+    members = new Collection<string, GuildMember>();
+    guilds = new Collection<string, any>();
+    commands = new Collection<string, any>();
+    channels = new Collection<string, any>();
 
     constructor(public config: Options) {
         super();
