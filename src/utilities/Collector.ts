@@ -2,6 +2,7 @@ import { EventEmitter } from "node:events";
 import { BaseInteraction } from "../utilities.js";
 import { CollectorOptions } from "../typings.js";
 import { MessageComponentInteraction } from "src/interactions/MessageComponentInteraction.js";
+import { InteractionType } from "discord-interactions";
 
 
 declare interface Collector {
@@ -21,7 +22,8 @@ class Collector extends EventEmitter {
         this.timer = options?.timeout ? setTimeout(() => this.end("timeout"), this.options?.timeout) : undefined;
 
         interaction.client.addListener("interaction", (value: MessageComponentInteraction) => {
-
+            if (value.type !== InteractionType.MESSAGE_COMPONENT) return;
+            
             this.emit("collect", value);
 
             this.collected.push(value);
