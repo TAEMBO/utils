@@ -7,12 +7,10 @@ export class ChatInputCommandInteractionOptions {
     public group: string | null = null;
     private _options = new Collection<string, string | number | boolean | APIRole | APIUser | APIInteractionDataResolvedChannelBase<ChannelType>>();
     
-    constructor(public interactionData: ChatInputCommandInteraction) {
-        const { body } = interactionData.req;
+    constructor(public data: any) {
+        if (!data.data.options) return;
 
-        if (!body.data.options) return;
-
-        for (const option of body.data.options) {
+        for (const option of data.data.options) {
             switch (option.type) {
                 case ApplicationCommandOptionType.Subcommand:
                     const subCmd = option;
@@ -24,17 +22,17 @@ export class ChatInputCommandInteractionOptions {
                     for (const subCmdOption of subCmd.options) {
                         switch (subCmdOption.type) {
                             case ApplicationCommandOptionType.User: 
-                                if (!body.data.resolved?.users || !body.data.resolved?.members) continue;
+                                if (!data.data.resolved?.users || !data.data.resolved?.members) continue;
 
-                                this._options.set(subCmdOption.name, Object.assign(body.data.resolved.users[subCmdOption.value], { member: body.data.resolved?.members[subCmdOption.value] }));
+                                this._options.set(subCmdOption.name, Object.assign(data.data.resolved.users[subCmdOption.value], { member: data.data.resolved?.members[subCmdOption.value] }));
                             case ApplicationCommandOptionType.Channel:
-                                if (!body.data.resolved?.channels) continue;
+                                if (!data.data.resolved?.channels) continue;
 
-                                this._options.set(subCmdOption.name, body.data.resolved.channels[subCmdOption.value]);
+                                this._options.set(subCmdOption.name, data.data.resolved.channels[subCmdOption.value]);
                             case ApplicationCommandOptionType.Role:
-                                if (!body.data.resolved?.roles) continue;
+                                if (!data.data.resolved?.roles) continue;
 
-                                this._options.set(subCmdOption.name, body.data.resolved.roles[subCmdOption.value]);
+                                this._options.set(subCmdOption.name, data.data.resolved.roles[subCmdOption.value]);
                             default:
                                 this._options.set(subCmdOption.name, subCmdOption.value);
                         }
@@ -52,17 +50,17 @@ export class ChatInputCommandInteractionOptions {
                         for (const subSubOtion of subOption.options) {
                             switch (subSubOtion.type) {
                                 case ApplicationCommandOptionType.User: 
-                                    if (!body.data.resolved?.users || !body.data.resolved?.members) continue;
+                                    if (!data.data.resolved?.users || !data.data.resolved?.members) continue;
 
-                                    this._options.set(subSubOtion.name, Object.assign(body.data.resolved.users[subSubOtion.value], { member: body.data.resolved?.members[subSubOtion.value] }));
+                                    this._options.set(subSubOtion.name, Object.assign(data.data.resolved.users[subSubOtion.value], { member: data.data.resolved?.members[subSubOtion.value] }));
                                 case ApplicationCommandOptionType.Channel:
-                                    if (!body.data.resolved?.channels) continue;
+                                    if (!data.data.resolved?.channels) continue;
 
-                                    this._options.set(subSubOtion.name, body.data.resolved.channels[subSubOtion.value]);
+                                    this._options.set(subSubOtion.name, data.data.resolved.channels[subSubOtion.value]);
                                 case ApplicationCommandOptionType.Role:
-                                    if (!body.data.resolved?.roles) return;
+                                    if (!data.data.resolved?.roles) return;
 
-                                    this._options.set(subSubOtion.name, body.data.resolved.roles[subSubOtion.value]);
+                                    this._options.set(subSubOtion.name, data.data.resolved.roles[subSubOtion.value]);
                                 default:
                                     this._options.set(subSubOtion.name, subSubOtion.value);
                             }

@@ -9,10 +9,10 @@ export class ChatInputCommandInteraction extends BaseInteraction {
     options: ChatInputCommandInteractionOptions;
     commandName: string;
 
-    constructor(public req: Request, public res: Response, public client: Client) {
-        super(req, res, client);
+    constructor(public data: any, public client: Client) {
+        super(data, client);
 
         this.options = new ChatInputCommandInteractionOptions(this);
-        this.commandName = req.body.data?.name;
+        this.commandName = data.data?.name;
     }
 }

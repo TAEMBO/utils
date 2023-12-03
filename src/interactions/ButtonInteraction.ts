@@ -7,8 +7,8 @@ import { TypedRequest } from "../typings.js";
 import { MessageComponentInteraction } from "./MessageComponentInteraction.js";
 
 export class ButtonInteraction extends MessageComponentInteraction {
-    constructor(public req: Request, public res: Response, public client: Client) {
-        super(req, res, client);
+    constructor(public data: any, public client: Client) {
+        super(data, client);
 
 
     }

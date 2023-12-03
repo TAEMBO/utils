@@ -29,16 +29,16 @@ export class BaseInteraction {
     channelId: string;
     guildId: string | null;
 
-    constructor(public req: Request, public res: Response, public client: Client) {
-        this.application_id = req.body.application_id;
-        this.id = req.body.id;
-        this.member = req.body.member ? new GuildMember(req.body.member) : null;
-        this.user = new User(req.body?.member?.user ?? req.body.user);
-        this.token = req.body.token;
-        this.type = req.body.type;
-        this.locale = req.body.locale ?? null;
-        this.channelId = req.body.channel_id;
-        this.guildId = req.body.guild_id;
+    constructor(public data: any, public client: Client) {
+        this.application_id = data.application_id;
+        this.id = data.id;
+        this.member = data.member ? new GuildMember(data.member) : null;
+        this.user = new User(data.member?.user ?? data.user);
+        this.token = data.token;
+        this.type = data.type;
+        this.locale = data.locale ?? null;
+        this.channelId = data.channel_id;
+        this.guildId = data.guild_id;
     }
 
     isChatInputCommand(): this is ChatInputCommandInteraction {
@@ -61,8 +61,13 @@ export class BaseInteraction {
 
     async reply(data: ReplyOptions) {
         data.flags = data.ephemeral ? InteractionResponseFlags.EPHEMERAL : null;
-        
-        this.res.send({ type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE, data });
+
+        await this.client.rest.post(Routes.interactionCallback(this.id, this.token), {
+            body: {
+                type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+                data
+            }
+        });
 
         const replyData = await this.client.rest.get(Routes.webhookMessage(this.application_id, this.token)) as APIMessage;
         

@@ -41,9 +41,9 @@ export default class Client extends EventEmitter {
 
             const interactionStructure = (() => {
                 if (req.body.type === InteractionType.ApplicationCommand) {
-                    return new ChatInputCommandInteraction(req, res, this);
+                    return new ChatInputCommandInteraction(req.body, this);
                 } else {
-                    return new BaseInteraction(req, res, this);
+                    return new BaseInteraction(req.body, this);
                 }
             })();
 

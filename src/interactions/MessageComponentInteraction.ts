@@ -9,10 +9,10 @@ export class MessageComponentInteraction extends BaseInteraction {
     customId: string;
     componentType: ComponentType;
 
-    constructor(public req: Request, public res: Response, public client: Client) {
-        super(req, res, client);
+    constructor(public data: any, public client: Client) {
+        super(data, client);
 
-        this.customId = req.body.data.custom_id;
-        this.componentType = req.body.data.component_type;
+        this.customId = data.data.custom_id;
+        this.componentType = data.data.component_type;
     }
 }
