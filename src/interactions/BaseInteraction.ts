@@ -1,9 +1,11 @@
-import { InteractionResponseFlags, InteractionType } from "discord-interactions";
-import { APIEmbed, APIMessage, Routes } from "discord-api-types/v10";
+import { InteractionResponseFlags, InteractionType, InteractionResponseType } from "discord-interactions";
+import { APIEmbed, APIMessage, ComponentType, Routes } from "discord-api-types/v10";
 import { Request , Response } from "express";
 import Client from "../client.js";
 import { CollectorOptions } from "../typings.js";
 import { User, GuildMember, Collector, Message, ChatInputCommandInteraction } from "../utilities.js";
+import { ButtonInteraction } from "./ButtonInteraction.js";
+import { MessageComponentInteraction } from "./MessageComponentInteraction.js";
 
 interface ReplyOptions {
     Title?: string;
@@ -17,6 +19,7 @@ interface ReplyOptions {
 }
 
 export class BaseInteraction {
+    application_id: string;
     id: string;
     user: User;
     member: GuildMember | null;
@@ -25,9 +28,9 @@ export class BaseInteraction {
     locale: string | null;
     channelId: string;
     guildId: string | null;
-    customId: string | null;
 
     constructor(public req: Request, public res: Response, public client: Client) {
+        this.application_id = req.body.application_id;
         this.id = req.body.id;
         this.member = req.body.member ? new GuildMember(req.body.member) : null;
         this.user = new User(req.body?.member?.user ?? req.body.user);
@@ -36,11 +39,20 @@ export class BaseInteraction {
         this.locale = req.body.locale ?? null;
         this.channelId = req.body.channel_id;
         this.guildId = req.body.guild_id;
-        this.customId = req.body.data.custom_id ?? null;
     }
 
     isChatInputCommand(): this is ChatInputCommandInteraction {
         return this.type === InteractionType.APPLICATION_COMMAND;
+    }
+
+    isMessageComponent(): this is MessageComponentInteraction {
+        return this.type === InteractionType.MESSAGE_COMPONENT;
+    }
+
+    isButton(): this is ButtonInteraction {
+        if (!this.isMessageComponent()) return false;
+
+        return this.componentType === ComponentType.Button;
     }
 
     get createdTimestamp() {
@@ -49,9 +61,10 @@ export class BaseInteraction {
 
     async reply(type: number, data: ReplyOptions) {
         data.flags = data.ephemeral ? InteractionResponseFlags.EPHEMERAL : null;
-
+        
         this.res.send({ type, data });
-        const replyData = await this.client.rest.get(Routes.webhookMessage(this.client.config.id, this.token)) as APIMessage;
+
+        const replyData = await this.client.rest.get(Routes.webhookMessage(this.application_id, this.token)) as APIMessage;
         
         return new Message(replyData);
     }
@@ -90,7 +103,7 @@ export class BaseInteraction {
         return replyData;
     }
     async update(data: ReplyOptions) {
-        const replyData = await (await fetch(`https://discord.com/api/interactions/${this.id}/${this.token}/callback`, {
+        const replyData = await fetch(`https://discord.com/api/interactions/${this.id}/${this.token}/callback`, {
             method: "POST",
             mode: "cors",
             headers: {
@@ -105,7 +118,7 @@ export class BaseInteraction {
                     attachments: data.files && data.files?.length ? data.files?.map((file, index) => ({ id: index.toString(), description: file.description })) : null,
                 },
             })
-        }));
+        });
 
         if(replyData.status !== 204) return null;
         const updatedData = await (await fetch(`https://discord.com/api/webhooks/${this.client.config.id}/${this.token}/messages/@original`, { method: "GET" })).json();

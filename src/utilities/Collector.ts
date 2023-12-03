@@ -1,6 +1,7 @@
 import { EventEmitter } from "node:events";
 import { BaseInteraction } from "../utilities.js";
 import { CollectorOptions } from "../typings.js";
+import { MessageComponentInteraction } from "src/interactions/MessageComponentInteraction.js";
 
 
 declare interface Collector {
@@ -11,7 +12,7 @@ declare interface Collector {
 class Collector extends EventEmitter {  
     collected: BaseInteraction[];
     timer: NodeJS.Timer | undefined;
-    filter: (int: BaseInteraction) => any;
+    filter: (int: MessageComponentInteraction) => any;
 
     constructor(private interaction: BaseInteraction, private options?: CollectorOptions) {
         super();
@@ -19,7 +20,7 @@ class Collector extends EventEmitter {
         this.filter = options?.filter ?? (() => true);
         this.timer = options?.timeout ? setTimeout(() => this.end("timeout"), this.options?.timeout) : undefined;
 
-        interaction.client.addListener("interaction", (value: BaseInteraction) => {
+        interaction.client.addListener("interaction", (value: MessageComponentInteraction) => {
 
             this.emit("collect", value);
 
@@ -38,7 +39,7 @@ class Collector extends EventEmitter {
         }, newTimeout ?? this.options?.timeout);
     }
 
-    collection(...args: Array<BaseInteraction>) {
+    collection(...args: Array<MessageComponentInteraction>) {
         const pass = this.filter(args[0]);
         if(!pass) return;
         this.emit("collect", args[0]);

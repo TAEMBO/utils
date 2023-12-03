@@ -1,9 +1,10 @@
 import { ApplicationCommandOptionType, APIEmbed, APIChatInputApplicationCommandInteraction, APIInteraction } from "discord-api-types/v10";
 import { BaseInteraction } from "./utilities.js";
 import { Request } from "express";
+import { MessageComponentInteraction } from "./interactions/MessageComponentInteraction.js";
 
 export interface CollectorOptions {
-    filter?: (int: BaseInteraction) => any;
+    filter?: (int: MessageComponentInteraction) => any;
     max?: number;
     timeout?: number;
 };
