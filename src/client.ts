@@ -1,4 +1,3 @@
-import express, { Request } from "express";
 import fs from "node:fs";
 import { InteractionResponseType, verifyKeyMiddleware } from "discord-interactions";
 import { EventEmitter } from "node:events";
@@ -10,55 +9,30 @@ import { APIEmbed, APIInteraction, APIMessage, InteractionType, ApplicationComma
 import { Collection } from "@discordjs/collection";
 
 export default class Client extends EventEmitter {
-    webserver = express();
-    rest = new REST().setToken(this.config.token);
+    rest = new REST().setToken(this.options.token);
     users = new Collection<string, User>();
     members = new Collection<string, GuildMember>();
     guilds = new Collection<string, any>();
     commands = new Collection<string, any>();
     channels = new Collection<string, any>();
 
-    constructor(public config: Options) {
+    constructor(public options: Options) {
         super();
-        this.init();
     }
 
-    async init() {
-        for (const file of fs.readdirSync('./commands')) {
-            const command = await import(`./commands/${file}`);
+    getInteraction(data: any) {
+        const interactionStructure = (() => {
+            if (data.type === InteractionType.ApplicationCommand) {
+                return new ChatInputCommandInteraction(data, this);
+            } else {
+                return new BaseInteraction(data, this);
+            }
+        })();
 
-            // if (!(command.default.data instanceof SlashCommandBuilder)) console.log('NOT_SLASHCOMMANDBUILDER', command.default.data.name);
+        this.emit("interaction", interactionStructure);
 
-            this.commands.set(command.default.data.name, command.default);
-        }
-        
-        const listener = this.webserver.listen(this.config.port, this.config.hostname, () => console.log("Live on", listener.address(), `at endpoint "/${this.config.id}"`));
-        
-        this.webserver.post(`/${this.config.id}`, verifyKeyMiddleware(this.config.publicKey), async (req, res) => {
-            console.log('/interaction -------------------------------------------', req.body);
-
-            if (req.body.type === InteractionType.Ping) return res.send({ type: InteractionResponseType.PONG });
-
-            const interactionStructure = (() => {
-                if (req.body.type === InteractionType.ApplicationCommand) {
-                    return new ChatInputCommandInteraction(req.body, this);
-                } else {
-                    return new BaseInteraction(req.body, this);
-                }
-            })();
-
-            this.emit("interaction", interactionStructure);
-
-
-            if (!interactionStructure.isChatInputCommand()) return;
-            
-            const cmd = this.commands.get(interactionStructure.commandName);
-            
-            if(!cmd) return;
-        
-            cmd.execute(interactionStructure);
-        });
-    }
+        return interactionStructure;
+    };
 
     async sendDm(userId: string, data: MessagePayLoad) {
         const dmFetch = await this.rest.post(Routes.userChannels(), {

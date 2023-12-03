@@ -74,7 +74,7 @@ export class BaseInteraction {
         return new Message(replyData);
     }
     async editReply(data: ReplyOptions) {
-        const replyData = await (await fetch(`https://discord.com/api/webhooks/${this.client.config.id}/${this.token}/messages/@original`, {
+        const replyData = await (await fetch(`https://discord.com/api/webhooks/${this.application_id}/${this.token}/messages/@original`, {
             method: "PATCH",
             mode: "cors",
             headers: {
@@ -91,7 +91,7 @@ export class BaseInteraction {
         return new Message(replyData);
     }
     async followUp(data: ReplyOptions) {
-        const replyData = await (await fetch(`https://discord.com/api/webhooks/${this.client.config.id}/${this.token}/`, {
+        const replyData = await (await fetch(`https://discord.com/api/webhooks/${this.application_id}/${this.token}/`, {
             method: "POST",
             mode: "cors",
             headers: {
@@ -126,7 +126,7 @@ export class BaseInteraction {
         });
 
         if(replyData.status !== 204) return null;
-        const updatedData = await (await fetch(`https://discord.com/api/webhooks/${this.client.config.id}/${this.token}/messages/@original`, { method: "GET" })).json();
+        const updatedData = await (await fetch(`https://discord.com/api/webhooks/${this.application_id}/${this.token}/messages/@original`, { method: "GET" })).json();
 
         return updatedData;
     }

@@ -13,9 +13,6 @@ export interface Options {
     token: string;
     publicKey: string;
     id: string;
-    port: number;
-    hostname: string;
-
 }
 
 export type ChatInputCommandInteractionOption = ChatInputCommandInteractionOptionBase &
