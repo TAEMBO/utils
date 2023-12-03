@@ -8,7 +8,7 @@ export default {
         name: "ping"
     },
     async execute(interaction: ChatInputCommandInteraction) {
-        interaction.reply(InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE, {
+        interaction.reply({
             components: [
                 {
                     "type": ComponentType.ActionRow,

@@ -17,10 +17,10 @@ export default {
             const result = eval(codetoeval)
             const evaledcode = new EmbedBuilder()
                 .addFields({ name: "Input", value: `\`${codetoeval}\`` }, { name: 'Evaled Code', value: `\`${result}\`` })
-            interaction.reply(4, { embeds: [evaledcode.toJSON()], ephemeral: false })
+            interaction.reply({ embeds: [evaledcode.toJSON()], ephemeral: false })
         } catch (err) {
             const codeerr = new EmbedBuilder().addFields({ name: "Input", value: `\`${codetoeval}\`` }, { name: "Error", value: `\`${err}\`` })
-            interaction.reply(4, { embeds: [codeerr.toJSON()], ephemeral: true })
+            interaction.reply({ embeds: [codeerr.toJSON()], ephemeral: true })
         }
     }
 };

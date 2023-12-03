@@ -7,7 +7,7 @@ export default {
         console.log(interaction.options.subcommand);
         
         interaction.options.get('sus')
-        const msg = await interaction.reply(InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE, { embeds: [new EmbedBuilder().setTitle("Pinging...").toJSON()] });
+        const msg = await interaction.reply({ embeds: [new EmbedBuilder().setTitle("Pinging...").toJSON()] });
 
         await interaction.editReply({ content: `Ping: ${msg.createdTimestamp - interaction.createdTimestamp}`, embeds: [] });
     },

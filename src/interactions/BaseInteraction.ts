@@ -59,10 +59,10 @@ export class BaseInteraction {
         return Number(BigInt(this.id) >> 22n) + 1420070400000;
     }
 
-    async reply(type: number, data: ReplyOptions) {
+    async reply(data: ReplyOptions) {
         data.flags = data.ephemeral ? InteractionResponseFlags.EPHEMERAL : null;
         
-        this.res.send({ type, data });
+        this.res.send({ type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE, data });
 
         const replyData = await this.client.rest.get(Routes.webhookMessage(this.application_id, this.token)) as APIMessage;
         
