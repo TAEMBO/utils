@@ -4,7 +4,6 @@ import { InteractionResponseType, verifyKeyMiddleware } from "discord-interactio
 import { EventEmitter } from "node:events";
 import { GuildMember, BaseInteraction, User, ChatInputCommandInteraction } from "./utilities.js";
 import config from './config.json' assert { type: 'json' };
-import {  } from "./utilities/rest.js";
 import { REST } from "@discordjs/rest";
 import { Options, MessagePayLoad, TypedRequest } from "./typings.js";
 import { APIEmbed, APIInteraction, APIMessage, InteractionType, ApplicationCommandType, ComponentType, Routes, APIUser, APIGuildMember, APIGuild, APIChannel } from "discord-api-types/v10";
