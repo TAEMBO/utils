@@ -1,4 +1,3 @@
-import { InteractionResponseType } from "discord-interactions";
 import { ChatInputCommandInteraction } from "../utilities.js";
 
 export default {

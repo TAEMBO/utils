@@ -1,5 +1,3 @@
-import { InteractionResponseType } from "discord-interactions";
-import { ButtonBuilder, EmbedBuilder } from "@discordjs/builders";
 import { ChatInputCommandInteraction } from "../utilities.js";
 import { ButtonStyle, ComponentType } from "discord-api-types/payloads/v10";
 

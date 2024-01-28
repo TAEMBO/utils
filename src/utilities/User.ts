@@ -18,7 +18,6 @@ export class User {
         this.id = data.id;
         this.flags = data.public_flags;
         this.username = data.username;
-
     }
     
     avatarURL(extension: "webp" | "png" | "jpg" | "jpeg" | "gif", size: 128 | 256 | 512 | 1024 | 2048) {

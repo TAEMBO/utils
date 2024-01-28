@@ -1,4 +1,3 @@
-import {  } from '../typings.js';
 import { User } from '../utilities.js';
 import { APIGuildMember } from 'discord-api-types/v10'; 
 

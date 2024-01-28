@@ -1,5 +1,4 @@
 import { APIRole, APIUser, ApplicationCommandOptionType, APIInteractionDataResolvedChannelBase, ChannelType } from "discord-api-types/v10";
-import { ChatInputCommandInteraction } from "../interactions/ChatInputCommandInteraction.js";
 import { Collection } from "@discordjs/collection";
 
 export class ChatInputCommandInteractionOptions {

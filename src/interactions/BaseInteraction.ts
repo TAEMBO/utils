@@ -1,6 +1,5 @@
 import { InteractionResponseFlags, InteractionType, InteractionResponseType } from "discord-interactions";
 import { APIEmbed, APIMessage, ComponentType, Routes } from "discord-api-types/v10";
-import { Request , Response } from "express";
 import Client from "../client.js";
 import { CollectorOptions } from "../typings.js";
 import { User, GuildMember, Collector, Message, ChatInputCommandInteraction } from "../utilities.js";

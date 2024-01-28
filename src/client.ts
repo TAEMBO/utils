@@ -1,11 +1,8 @@
-import fs from "node:fs";
-import { InteractionResponseType, verifyKeyMiddleware } from "discord-interactions";
 import { EventEmitter } from "node:events";
 import { GuildMember, BaseInteraction, User, ChatInputCommandInteraction } from "./utilities.js";
-import config from './config.json' assert { type: 'json' };
 import { REST } from "@discordjs/rest";
-import { Options, MessagePayLoad, TypedRequest } from "./typings.js";
-import { APIEmbed, APIInteraction, APIMessage, InteractionType, ApplicationCommandType, ComponentType, Routes, APIUser, APIGuildMember, APIGuild, APIChannel } from "discord-api-types/v10";
+import { Options, MessagePayLoad } from "./typings.js";
+import { APIMessage, InteractionType, Routes, APIUser, APIGuildMember, APIGuild, APIChannel } from "discord-api-types/v10";
 import { Collection } from "@discordjs/collection";
 
 export default class Client extends EventEmitter {

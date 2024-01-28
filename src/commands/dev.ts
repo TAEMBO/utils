@@ -1,4 +1,3 @@
-import { InteractionResponseType } from "discord-interactions";
 import { ChatInputCommandInteraction } from "../utilities.js";
 import { SlashCommandBuilder, EmbedBuilder } from "@discordjs/builders";
 
