@@ -1,6 +1,6 @@
 import { InteractionResponseFlags, InteractionType, InteractionResponseType } from "discord-interactions";
 import { APIEmbed, APIMessage, ComponentType, Routes } from "discord-api-types/v10";
-import Client from "../client.js";
+import App from "../app.js";
 import { CollectorOptions } from "../typings.js";
 import { User, GuildMember, Collector, Message, ChatInputCommandInteraction } from "../utilities.js";
 import { ButtonInteraction } from "./ButtonInteraction.js";
@@ -28,7 +28,7 @@ export class BaseInteraction {
     channelId: string;
     guildId: string | null;
 
-    constructor(public data: any, public client: Client) {
+    constructor(public data: any, public client: typeof App) {
         this.application_id = data.application_id;
         this.id = data.id;
         this.member = data.member ? new GuildMember(data.member) : null;
