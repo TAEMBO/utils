@@ -1,7 +1,7 @@
 {
   "name": "interactions-only",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "app.js",
   "keywords": [],
   "author": "TAEMBO",
   "type": "module",
@@ -10,6 +10,7 @@
   "dependencies": {
     "@discordjs/builders": "^1.6.5",
     "@discordjs/collection": "^2.0.0",
+    "@discordjs/core": "^1.1.1",
     "@discordjs/rest": "^2.2.0",
     "discord-api-types": "^0.37.60",
     "discord-interactions": "^3.4.0",

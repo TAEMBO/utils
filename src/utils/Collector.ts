@@ -1,28 +1,26 @@
 import { EventEmitter } from "node:events";
-import { BaseInteraction } from "../utilities.js";
 import { CollectorOptions } from "../typings.js";
-import { MessageComponentInteraction } from "src/interactions/MessageComponentInteraction.js";
-import { InteractionType } from "discord-interactions";
-
+import { APIBaseInteraction, APIMessageComponentInteraction, InteractionType } from "discord-api-types/v10";
+import App from "../app.js";
 
 declare interface Collector {
-    on(event: 'collect', listener: (args: BaseInteraction) => any): this;
-    on(event: 'end', listener: (args: BaseInteraction[]) => any): this;
+    on(event: 'collect', listener: (args: APIBaseInteraction<InteractionType, any>) => any): this;
+    on(event: 'end', listener: (args: APIBaseInteraction<InteractionType, any>[]) => any): this;
 }
 
 class Collector extends EventEmitter {  
-    collected: BaseInteraction[];
+    collected: APIBaseInteraction<InteractionType, any>[];
     timer: NodeJS.Timer | undefined;
-    filter: (int: MessageComponentInteraction) => any;
+    filter: (int: APIMessageComponentInteraction) => any;
 
-    constructor(private interaction: BaseInteraction, private options?: CollectorOptions) {
+    constructor(private app: typeof App, interaction: APIBaseInteraction<InteractionType, any>, private options?: CollectorOptions) {
         super();
         this.collected = [];
         this.filter = options?.filter ?? (() => true);
         this.timer = options?.timeout ? setTimeout(() => this.end("timeout"), this.options?.timeout) : undefined;
 
-        interaction.client.addListener("interaction", (value: MessageComponentInteraction) => {
-            if (value.type !== InteractionType.MESSAGE_COMPONENT) return;
+        app.addListener("interaction", (value: APIMessageComponentInteraction) => {
+            if (value.type !== InteractionType.MessageComponent) return;
             
             this.emit("collect", value);
 
@@ -41,17 +39,17 @@ class Collector extends EventEmitter {
         }, newTimeout ?? this.options?.timeout);
     }
 
-    collection(...args: Array<MessageComponentInteraction>) {
+    collection(...args: APIMessageComponentInteraction[]) {
         const pass = this.filter(args[0]);
-        if(!pass) return;
+        if (!pass) return;
         this.emit("collect", args[0]);
         this.collected.push(args[0]); 
-        if(this.collected && this.collected.length === this.options?.max){
+        if (this.collected && this.collected.length === this.options?.max) {
             this.end();
         }
     }
     end(reason?: string) {
-        this.interaction.client.removeListener("interaction", this.collection);
+        this.app.removeListener("interaction", this.collection);
         clearTimeout(this.timer);
         this.emit("end", this.collected);
         return true;

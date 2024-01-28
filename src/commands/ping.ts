@@ -1,38 +1,19 @@
-import { ChatInputCommandInteraction } from "../utilities.js";
-import { ButtonStyle, ComponentType } from "discord-api-types/payloads/v10";
+import { APIChatInputApplicationCommandInteraction } from "discord-api-types/payloads/v10";
+import App from "../app.js";
+import { timeFromSnowflake } from "../utilities.js";
+import { SlashCommandBuilder } from "@discordjs/builders";
 
 export default {
-    data: {
-        name: "ping"
-    },
-    async execute(interaction: ChatInputCommandInteraction) {
-        interaction.reply({
-            components: [
-                {
-                    "type": ComponentType.ActionRow,
-                    "components": [
-                        {
-                            "type": ComponentType.RoleSelect,
-                            "custom_id": "role-menu"
-                        }
-                    ]
-                },
-                {
-                    "type": ComponentType.ActionRow,
-                    "components": [
-                        {
-                            "type": ComponentType.Button,
-                            "custom_id": "beans",
-                            "style": ButtonStyle.Success,
-                            "label": "Beans"
-                        }
-                    ]
-                }
-            ]
+    async execute(app: typeof App, interaction: APIChatInputApplicationCommandInteraction) {
+        await app.api.interactions.reply(interaction.id, interaction.token, { content: "Pinging..." });
+
+        const msg = await app.api.webhooks.getMessage(app.config.id, interaction.token, "@original");
+
+        await app.api.interactions.editReply(app.config.id, interaction.token, {
+            content: `Round-trip: \`${timeFromSnowflake(msg.id) - timeFromSnowflake(interaction.id)}\`ms`
         });
-
-        // const msg = await interaction.reply(InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE, { embeds: [new EmbedBuilder().setTitle("Pinging...").toJSON()] });
-
-        // await interaction.editReply({ content: `Ping: ${msg.createdTimestamp - interaction.createdTimestamp}`, embeds: [] });
-    }
+    },
+    data: new SlashCommandBuilder()
+        .setName("ping")
+        .setDescription("Check bot's ping")
 };
