@@ -8,13 +8,13 @@
   "license": "ISC",
   "description": "HTTP Discord interactions bot",
   "dependencies": {
-    "@discordjs/builders": "^1.6.5",
+    "@discordjs/builders": "^1.7.0",
     "@discordjs/collection": "^2.0.0",
     "@discordjs/core": "^1.1.1",
     "@discordjs/rest": "^2.2.0",
-    "discord-api-types": "^0.37.60",
+    "discord-api-types": "^0.37.69",
     "discord-interactions": "^3.4.0",
-    "express": "^4.18.1"
+    "express": "^4.18.2"
   },
   "devDependencies": {
     "@types/express": "^4.17.14",
