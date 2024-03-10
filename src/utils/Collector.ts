@@ -1,6 +1,6 @@
 import { EventEmitter } from "node:events";
 import { CollectorOptions } from "../typings.js";
-import { APIBaseInteraction, APIMessageComponentInteraction, InteractionType } from "discord-api-types/v10";
+import { APIBaseInteraction, APIMessageComponentInteraction, InteractionType } from "@discordjs/core/http-only";
 import App from "../app.js";
 
 declare interface Collector {
@@ -10,14 +10,14 @@ declare interface Collector {
 
 class Collector extends EventEmitter {  
     collected: APIBaseInteraction<InteractionType, any>[];
-    timer: NodeJS.Timer | undefined;
+    timer: NodeJS.Timeout | undefined;
     filter: (int: APIMessageComponentInteraction) => any;
 
-    constructor(private app: typeof App, interaction: APIBaseInteraction<InteractionType, any>, private options?: CollectorOptions) {
+    constructor(private app: typeof App, interaction: APIBaseInteraction<InteractionType, any>, private options: CollectorOptions = {}) {
         super();
         this.collected = [];
-        this.filter = options?.filter ?? (() => true);
-        this.timer = options?.timeout ? setTimeout(() => this.end("timeout"), this.options?.timeout) : undefined;
+        this.filter = options.filter ?? (() => true);
+        this.timer = options.timeout ? setTimeout(() => this.end("timeout"), options.timeout) : undefined;
 
         app.addListener("interaction", (value: APIMessageComponentInteraction) => {
             if (value.type !== InteractionType.MessageComponent) return;
@@ -26,7 +26,7 @@ class Collector extends EventEmitter {
 
             this.collected.push(value);
             
-            if (options?.max && this.collected.length === options?.max) {
+            if (options.max && this.collected.length === options.max) {
                 this.end("max");
             }
         });

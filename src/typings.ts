@@ -1,4 +1,4 @@
-import { APIMessageComponentInteraction } from "discord-api-types/v10";
+import { APIMessageComponentInteraction } from "@discordjs/core/http-only";
 
 export interface CollectorOptions {
     filter?: (int: APIMessageComponentInteraction) => any;

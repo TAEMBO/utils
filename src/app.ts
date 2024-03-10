@@ -4,10 +4,9 @@ import { resolve } from "node:path";
 import { EventEmitter } from "node:events";
 import config from './config.json' assert { type: "json" };
 import { REST } from "@discordjs/rest";
-import { InteractionType, InteractionResponseType, APIBaseInteraction, APIChatInputApplicationCommandInteraction, ApplicationCommandType } from "discord-api-types/v10";
 import { Collection } from "@discordjs/collection";
 import { verifyKeyMiddleware } from "discord-interactions";
-import { API } from "@discordjs/core/http-only";
+import { API, InteractionType, InteractionResponseType, APIBaseInteraction, APIChatInputApplicationCommandInteraction, ApplicationCommandType } from "@discordjs/core/http-only";
 
 export default new class App extends EventEmitter {
     readonly config = config;
