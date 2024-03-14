@@ -53,7 +53,7 @@ export default {
                 .then(() => app.api.webhooks.getMessage(app.config.id, interaction.token, "@original"))
                 .catch(() => app.api.channels.createMessage(interaction.channel.id, msgPayload));
 
-            new Collector(app, interaction, { filter: (int) => int.user?.id === interaction.user?.id, max: 1 })
+            new Collector(app, interaction, { filter: (int) => int.member?.user.id === interaction.member?.user.id, max: 1 })
                 .on("collect", int => app.api.interactions.reply(int.id, int.token, { content: `\`\`\`\n${err.stack.slice(0, 1950)}\`\`\`` }))
                 .on("end", () => app.api.channels.editMessage(interaction.channel.id, msg.id, { components: [] }));
 
