@@ -108,6 +108,8 @@ export class OptionResolver {
      * @param required Whether to throw an error if there is no subcommand.
      * @returns The name of the selected subcommand, or null if not set and not required.
      */
+    public getSubcommand(required?: true): string;
+    public getSubcommand(required: boolean): string | null;
     public getSubcommand(required = true) {
         if (required && !this._subcommand) {
             throw new Error("No subcommand specified for interaction.");
@@ -121,6 +123,8 @@ export class OptionResolver {
      * @param required Whether to throw an error if there is no subcommand group.
      * @returns The name of the selected subcommand group, or null if not set and not required.
      */
+    public getSubcommandGroup(required: true): string;
+    public getSubcommandGroup(required?: boolean): string | null;
     public getSubcommandGroup(required = false) {
         if (required && !this._group) {
             throw new Error("No subcommand group specified for interaction.");
@@ -135,6 +139,8 @@ export class OptionResolver {
      * @param required Whether to throw an error if the option is not found.
      * @returns The value of the option, or null if not set and not required.
      */
+    public getBoolean(name: string, required: true): boolean;
+    public getBoolean(name: string, required?: boolean): boolean | null;
     public getBoolean(name: string, required = false) {
         const option = this._getTypedOption(name, [ApplicationCommandOptionType.Boolean], ['value'], required);
         return option?.value ?? null;
@@ -148,6 +154,30 @@ export class OptionResolver {
      * @returns 
      * The value of the option, or null if not set and not required.
      */
+    public getChannel<const Type extends ChannelType = ChannelType>(
+        name: string,
+        required: true,
+        channelTypes?: readonly Type[],
+    ): Extract<
+        APIChannel,
+        {
+            type: Type extends ChannelType.PublicThread | ChannelType.AnnouncementThread
+                ? ChannelType.PublicThread | ChannelType.AnnouncementThread
+                : Type;
+        }
+    >;
+    public getChannel<const Type extends ChannelType = ChannelType>(
+        name: string,
+        required?: boolean,
+        channelTypes?: readonly Type[],
+    ): Extract<
+        APIChannel,
+        {
+            type: Type extends ChannelType.PublicThread | ChannelType.AnnouncementThread
+                ? ChannelType.PublicThread | ChannelType.AnnouncementThread
+                : Type;
+        }
+    > | null;
     public getChannel(name: string, required = false, channelTypes: ChannelType[] = []) {
         const option = this._getTypedOption(name, [ApplicationCommandOptionType.Channel], ['channel'], required);
         const channel: APIChannel = option?.channel ?? null;
@@ -165,6 +195,8 @@ export class OptionResolver {
      * @param required Whether to throw an error if the option is not found.
      * @returns The value of the option, or null if not set and not required.
      */
+    public getString(name: string, required: true): string;
+    public getString(name: string, required?: boolean): string | null;
     public getString(name: string, required = false) {
         const option: APIApplicationCommandInteractionDataStringOption = this._getTypedOption(name, [ApplicationCommandOptionType.String], ['value'], required);
         
@@ -177,6 +209,8 @@ export class OptionResolver {
      * @param required Whether to throw an error if the option is not found.
      * @returns The value of the option, or null if not set and not required.
      */
+    public getInteger(name: string, required: true): number;
+    public getInteger(name: string, required?: boolean): number | null;
     public getInteger(name: string, required = false) {
         const option: APIApplicationCommandInteractionDataIntegerOption = this._getTypedOption(name, [ApplicationCommandOptionType.Integer], ['value'], required);
         
@@ -189,6 +223,8 @@ export class OptionResolver {
      * @param required Whether to throw an error if the option is not found.
      * @returns The value of the option, or null if not set and not required.
      */
+    public getNumber(name: string, required: true): number;
+    public getNumber(name: string, required?: boolean): number | null;
     public getNumber(name: string, required = false) {
         const option: APIApplicationCommandInteractionDataNumberOption = this._getTypedOption(name, [ApplicationCommandOptionType.Number], ['value'], required);
         
@@ -201,6 +237,8 @@ export class OptionResolver {
      * @param required Whether to throw an error if the option is not found.
      * @returns The value of the option, or null if not set and not required.
      */
+    public getUser(name: string, required: true): APIUser;
+    public getUser(name: string, required?: boolean): APIUser | null;
     public getUser(name: string, required = false) {
         const option: { user: APIUser } = this._getTypedOption(
             name,
@@ -218,7 +256,7 @@ export class OptionResolver {
      * @returns 
      * The value of the option, or null if the user is not present in the guild or the option is not set.
      */
-    public getMember(name: string) {
+    public getMember(name: string): APIGuildMember | null {
         const option: { member: APIGuildMember } = this._getTypedOption(
             name,
             [ApplicationCommandOptionType.User, ApplicationCommandOptionType.Mentionable],
@@ -235,6 +273,8 @@ export class OptionResolver {
      * @param required Whether to throw an error if the option is not found.
      * @returns The value of the option, or null if not set and not required.
      */
+    public getRole(name: string, required: true): APIRole;
+    public getRole(name: string, required?: boolean): APIRole | null;
     public getRole(name: string, required = false) {
         const option: { role: APIRole } = this._getTypedOption(
             name,
@@ -252,6 +292,8 @@ export class OptionResolver {
      * @param required Whether to throw an error if the option is not found.
      * @returns The value of the option, or null if not set and not required.
      */
+    public getAttachment(name: string, required: true): APIAttachment;
+    public getAttachment(name: string, required?: boolean): APIAttachment | null;
     public getAttachment(name: string, required = false) {
         const option: { attachment: APIAttachment } = this._getTypedOption(name, [ApplicationCommandOptionType.Attachment], ['attachment'], required);
         
@@ -265,6 +307,8 @@ export class OptionResolver {
      * @returns 
      * The value of the option, or null if not set and not required.
      */
+    public getMentionable(name: string, required: true): APIGuildMember | APIRole | APIUser;
+    public getMentionable(name: string,required?: boolean): APIGuildMember | APIRole | APIUser | null;
     public getMentionable(name: string, required = false) {
         const option = this._getTypedOption(
             name,
@@ -283,6 +327,8 @@ export class OptionResolver {
      * @returns 
      * The value of the option, or null if not set and not required.
      */
+    public getMessage(name: string, required: true): APIMessage;
+    public getMessage(name: string, required?: boolean): APIMessage | null;
     public getMessage(name: string, required = false) {
         const option: { message: APIMessage } = this._getTypedOption(name, ['_MESSAGE'], ['message'], required);
         
