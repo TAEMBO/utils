@@ -7,6 +7,7 @@ import { REST } from "@discordjs/rest";
 import { Collection } from "@discordjs/collection";
 import { verifyKeyMiddleware } from "discord-interactions";
 import { API, InteractionType, InteractionResponseType, APIBaseInteraction, APIChatInputApplicationCommandInteraction, ApplicationCommandType } from "@discordjs/core/http-only";
+import { OptionResolver } from "./utilities.js";
 
 export default new class App extends EventEmitter {
     readonly config = config;
@@ -42,7 +43,7 @@ export default new class App extends EventEmitter {
 
                 if (!command) return;
 
-                command.execute(this, interaction);
+                command.execute(this, interaction, new OptionResolver(interaction.data.options ?? [], interaction.data.resolved ?? {}));
             }
 
             this.emit("interaction", interaction);
