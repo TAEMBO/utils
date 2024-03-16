@@ -1,30 +1,17 @@
 import App from "../app.js";
-import {
-    type APIApplicationCommandInteractionDataBooleanOption,
-    type APIApplicationCommandInteractionDataIntegerOption,
-    type APIApplicationCommandInteractionDataStringOption,
-    type APIChatInputApplicationCommandInteraction,
-    ApplicationCommandOptionType,
-    ButtonStyle
-} from "@discordjs/core/http-only";
+import { type APIChatInputApplicationCommandInteraction, ButtonStyle } from "@discordjs/core/http-only";
 import { performance } from "perf_hooks";
 import { setTimeout as sleep } from "node:timers/promises";
 import util from "node:util";
 import { ActionRowBuilder, ButtonBuilder, EmbedBuilder, SlashCommandBuilder } from "@discordjs/builders";
-import { Collector } from "../utilities.js";
+import { Collector, type OptionResolver } from "../utilities.js";
 
 export default {
-    async execute(app: typeof App, interaction: APIChatInputApplicationCommandInteraction) {
+    async execute(app: typeof App, interaction: APIChatInputApplicationCommandInteraction, options: OptionResolver) {
         sleep;
-        const code = (interaction.data.options!.find(option => {
-            return option.type === ApplicationCommandOptionType.String && option.name === "code"
-        }) as APIApplicationCommandInteractionDataStringOption).value;
-        const depth = (interaction.data.options!.find(option => {
-            return option.type === ApplicationCommandOptionType.Integer && option.name === "depth"
-        }) as APIApplicationCommandInteractionDataIntegerOption)?.value ?? 1;
-        const useAsync = (interaction.data.options!.find(option => {
-            return option.type === ApplicationCommandOptionType.Boolean && option.name === "async"
-        }) as APIApplicationCommandInteractionDataBooleanOption)?.value ?? false;
+        const code = options.getString("code", true);
+        const depth = options.getInteger("depth") ?? 1;
+        const useAsync = Boolean(options.getString("async", false)); 
         const embed = new EmbedBuilder()
             .setTitle("__Eval__")
             .setColor(4203516)

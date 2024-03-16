@@ -1,7 +1,7 @@
 import { EmbedBuilder, SlashCommandBuilder } from "@discordjs/builders";
 import type App from "../app.js";
-import { formatString } from "../utilities.js";
-import { APIChatInputApplicationCommandInteraction, ApplicationCommandOptionType, APIApplicationCommandInteractionDataSubcommandOption, APIApplicationCommandInteractionDataStringOption } from "@discordjs/core/http-only";
+import { type OptionResolver, formatString } from "../utilities.js";
+import { APIChatInputApplicationCommandInteraction } from "@discordjs/core/http-only";
 
 interface Quantity {
     readonly name: string;
@@ -190,15 +190,9 @@ function findUnit(unitNameQuery: string) {
 }
 
 export default {
-    async execute(app: typeof App, interaction: APIChatInputApplicationCommandInteraction) {
-        const subcommand = (interaction.data.options!.find(option => {
-            return option.type === ApplicationCommandOptionType.Subcommand
-        }) as APIApplicationCommandInteractionDataSubcommandOption);
-        
-        if (subcommand.name === "help") {
-            const chosenQuantity = (subcommand.options!.find(option => {
-                return option.type === ApplicationCommandOptionType.String && option.name === "quantity"
-            }) as APIApplicationCommandInteractionDataStringOption | undefined)?.value;
+    async execute(app: typeof App, interaction: APIChatInputApplicationCommandInteraction, options: OptionResolver) {
+        if (options.getSubcommand() === "help") {
+            const chosenQuantity = options.getString("quantity", false);
 
             if (chosenQuantity) {
                 const units = quantities[chosenQuantity];
@@ -238,9 +232,7 @@ export default {
             ] });
         }
 
-        const starters = (subcommand.options!.find(option => {
-            return option.type === ApplicationCommandOptionType.String && option.name === "starter"
-        }) as APIApplicationCommandInteractionDataStringOption).value.split(",").map(starter => {
+        const starters = options.getString("starter", true).split(",").map(starter => {
             starter = starter.trim();
 
             const stMtch = starter.match(/[0-9,.-]*/gi)!;
@@ -257,9 +249,7 @@ export default {
 
         if (!areValidStarters(starters)) return await app.api.interactions.reply(interaction.id, interaction.token, { content: "You must convert *something;* Your message has 0 starters." });
 
-        const targetPortion = (subcommand.options!.find(option => {
-            return option.type === ApplicationCommandOptionType.String && option.name === "target"
-        }) as APIApplicationCommandInteractionDataStringOption).value;
+        const targetPortion = options.getString("target", true);
         
         const target = findUnit(targetPortion.endsWith("s") && targetPortion.length > 3
             ? targetPortion.slice(0, targetPortion.length - 1)
