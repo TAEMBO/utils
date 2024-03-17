@@ -1,17 +1,17 @@
-import App from "../app.js";
-import { type APIChatInputApplicationCommandInteraction, ButtonStyle } from "@discordjs/core/http-only";
+import { ButtonStyle } from "@discordjs/core/http-only";
 import { performance } from "perf_hooks";
 import { setTimeout as sleep } from "node:timers/promises";
 import util from "node:util";
 import { ActionRowBuilder, ButtonBuilder, EmbedBuilder, SlashCommandBuilder } from "@discordjs/builders";
-import { Collector, type OptionResolver } from "../utilities.js";
+import { Collector } from "../utilities.js";
+import { Command } from "../structures/command.js";
 
-export default {
-    async execute(app: typeof App, interaction: APIChatInputApplicationCommandInteraction, options: OptionResolver) {
+export default new Command({
+    async run(app, interaction, options) {
         sleep;
         const code = options.getString("code", true);
         const depth = options.getInteger("depth") ?? 1;
-        const useAsync = Boolean(options.getString("async", false)); 
+        const useAsync = Boolean(options.getString("async", false));
         const embed = new EmbedBuilder()
             .setTitle("__Eval__")
             .setColor(4203516)
@@ -71,4 +71,4 @@ export default {
         .addBooleanOption(x => x
             .setName("async")
             .setDescription("Whether to wrap the code in an async block or not"))
-};
+});

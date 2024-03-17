@@ -8,11 +8,12 @@ import { Collection } from "@discordjs/collection";
 import { verifyKeyMiddleware } from "discord-interactions";
 import { API, InteractionType, InteractionResponseType, APIBaseInteraction, APIChatInputApplicationCommandInteraction, ApplicationCommandType } from "@discordjs/core/http-only";
 import { OptionResolver } from "./utilities.js";
+import { Command } from "./structures/command.js";
 
 export default new class App extends EventEmitter {
     readonly config = config;
     readonly express = Express();
-    readonly commands = new Collection<string, any>();
+    readonly commands = new Collection<string, Command>();
     readonly api = new API(new REST().setToken(this.config.token));
 
     constructor() {
@@ -25,6 +26,12 @@ export default new class App extends EventEmitter {
     private async init() {
         for (const file of await readdir(resolve("./commands"))) {
             const command = await import(`./commands/${file}`);
+
+            if (!(command.default instanceof Command)) {
+                console.log(`${file} not instance of Command`);
+
+                continue;
+            }
         
             this.commands.set(command.default.data.name, command.default);
         }
@@ -43,7 +50,7 @@ export default new class App extends EventEmitter {
 
                 if (!command) return;
 
-                command.execute(this, interaction, new OptionResolver(interaction.data.options ?? [], interaction.data.resolved ?? {}));
+                command.run(this, interaction, new OptionResolver(interaction.data.options ?? [], interaction.data.resolved ?? {}));
             }
 
             this.emit("interaction", interaction);

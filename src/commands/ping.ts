@@ -1,10 +1,9 @@
-import App from "../app.js";
-import { APIChatInputApplicationCommandInteraction } from "@discordjs/core/http-only";
 import { timeFromSnowflake } from "../utilities.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
+import { Command } from "../structures/command.js";
 
-export default {
-    async execute(app: typeof App, interaction: APIChatInputApplicationCommandInteraction) {
+export default new Command({
+    async run(app, interaction) {
         await app.api.interactions.reply(interaction.id, interaction.token, { content: "Pinging..." });
 
         const msg = await app.api.webhooks.getMessage(app.config.id, interaction.token, "@original");
@@ -16,4 +15,4 @@ export default {
     data: new SlashCommandBuilder()
         .setName("ping")
         .setDescription("Check bot's ping")
-};
+});

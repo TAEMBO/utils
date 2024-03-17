@@ -1,7 +1,6 @@
 import { EmbedBuilder, SlashCommandBuilder } from "@discordjs/builders";
-import type App from "../app.js";
-import { type OptionResolver, formatString } from "../utilities.js";
-import { APIChatInputApplicationCommandInteraction } from "@discordjs/core/http-only";
+import { formatString } from "../utilities.js";
+import { Command } from "../structures/command.js";
 
 interface Quantity {
     readonly name: string;
@@ -189,8 +188,8 @@ function findUnit(unitNameQuery: string) {
     }
 }
 
-export default {
-    async execute(app: typeof App, interaction: APIChatInputApplicationCommandInteraction, options: OptionResolver) {
+export default new Command({
+    async run(app, interaction, options) {
         if (options.getSubcommand() === "help") {
             const chosenQuantity = options.getString("quantity", false);
 
@@ -314,4 +313,4 @@ export default {
                 .setName("target")
                 .setDescription("The target quantity")
                 .setRequired(true)))
-}
+});
