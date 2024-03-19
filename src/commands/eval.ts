@@ -1,9 +1,9 @@
-import { ButtonStyle } from "@discordjs/core/http-only";
+import * as Discord from "@discordjs/core/http-only";
 import { performance } from "perf_hooks";
 import { setTimeout as sleep } from "node:timers/promises";
 import util from "node:util";
 import { ActionRowBuilder, ButtonBuilder, EmbedBuilder, SlashCommandBuilder } from "@discordjs/builders";
-import { Collector } from "../utilities.js";
+import * as utilities from "../utilities.js";
 import { Command } from "../structures/command.js";
 
 export default new Command({
@@ -11,7 +11,7 @@ export default new Command({
         sleep;
         const code = options.getString("code", true);
         const depth = options.getInteger("depth") ?? 1;
-        const useAsync = Boolean(options.getString("async", false));
+        const useAsync = Boolean(options.getBoolean("async", false));
         const embed = new EmbedBuilder()
             .setTitle("__Eval__")
             .setColor(4203516)
@@ -33,14 +33,14 @@ export default new Command({
 
             const msgPayload = {
                 embeds: [embed.toJSON()],
-                components: [new ActionRowBuilder<ButtonBuilder>().addComponents(new ButtonBuilder().setCustomId("stack").setStyle(ButtonStyle.Primary).setLabel("Stack")).toJSON()],
+                components: [new ActionRowBuilder<ButtonBuilder>().addComponents(new ButtonBuilder().setCustomId("stack").setStyle(Discord.ButtonStyle.Primary).setLabel("Stack")).toJSON()],
             };
 
             const msg = await app.api.interactions.reply(interaction.id, interaction.token, msgPayload)
                 .then(() => app.api.webhooks.getMessage(app.config.id, interaction.token, "@original"))
                 .catch(() => app.api.channels.createMessage(interaction.channel.id, msgPayload));
 
-            new Collector(app, { filter: (int) => int.member?.user.id === interaction.member?.user.id, max: 1 })
+            new utilities.Collector(app, { filter: (int) => int.member?.user.id === interaction.member?.user.id, max: 1 })
                 .on("collect", int => app.api.interactions.reply(int.id, int.token, { content: `\`\`\`\n${err.stack.slice(0, 1950)}\`\`\`` }))
                 .on("end", () => app.api.channels.editMessage(interaction.channel.id, msg.id, { components: [] }));
 
