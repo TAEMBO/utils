@@ -28,7 +28,7 @@ export default new class App extends EventEmitter {
             const command = await import(`./commands/${file}`);
 
             if (!(command.default instanceof Command)) {
-                console.log(`${file} not instance of Command`);
+                log("Red", `${file} not instance of Command`);
 
                 continue;
             }
@@ -50,7 +50,7 @@ export default new class App extends EventEmitter {
                 if (!command) return;
                 
                 log("White", [
-                    `${(interaction.member ?? interaction).user!.username}\x1b[37m used `,
+                    `\x1b[32m${(interaction.member ?? interaction).user!.username}\x1b[37m used `,
                     `/${interaction.data.name} ${options.getSubcommand(false) ?? ""}\x1b[37m in `,
                     `#${interaction.channel?.name ?? interaction.channel.id}`
                 ].join("\x1b[32m"));
@@ -59,6 +59,6 @@ export default new class App extends EventEmitter {
             }
 
             this.emit("interaction", interaction);
-        }).listen(config.port, config.hostname, () => console.log(`Live on port ${config.port} at endpoint "/${this.config.publicKey}"`));
+        }).listen(config.port, config.hostname, () => log("Blue", `Live on \x1b[33m${config.port}\x1b[34m at \x1b[33m/${this.config.publicKey}`));
     }
 }();

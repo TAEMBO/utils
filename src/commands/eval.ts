@@ -22,7 +22,7 @@ export default new Command({
         try {
             output = await eval(useAsync ? `(async () => { ${code} })()` : code);
         } catch (err: any) {
-            console.log(err);
+            utilities.log("Red", err);
             
             embed
                 .setColor(16711680)
