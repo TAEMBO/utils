@@ -4,5 +4,9 @@
  * @returns A UNIX timestamp
  */
 export function timeFromSnowflake(id: string) {
-    return Number(BigInt(id) >> 22n) + 1420070400000;
+    if (!Number(id)) {
+        return new Date(id).getTime();
+    } else {
+        return Number(BigInt(id) >> 22n) + 1420070400000;
+    }
 }
