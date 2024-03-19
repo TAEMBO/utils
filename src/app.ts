@@ -36,10 +36,8 @@ export default new class App extends EventEmitter {
             this.commands.set(command.default.data.name, command.default);
         }
 
-        this.express.post(`/${this.config.id}`, verifyKeyMiddleware(this.config.publicKey), (req, res) => {
+        this.express.post(`/${this.config.publicKey}`, verifyKeyMiddleware(this.config.publicKey), (req, res) => {
             const interaction: APIBaseInteraction<InteractionType, any> = req.body;
-            
-            console.log('/interaction -------------------------------------------', interaction);
             
             if (interaction.type === InteractionType.Ping) {
                 return res.send({ type: InteractionResponseType.Pong });
@@ -54,6 +52,6 @@ export default new class App extends EventEmitter {
             }
 
             this.emit("interaction", interaction);
-        }).listen(config.port, config.hostname, () => console.log(`Live on port ${config.port} at endpoint "/${this.config.id}"`));
+        }).listen(config.port, config.hostname, () => console.log(`Live on port ${config.port} at endpoint "/${this.config.publicKey}"`));
     }
 }();

@@ -6,9 +6,9 @@ export default new Command({
     async run(app, interaction) {
         await app.api.interactions.reply(interaction.id, interaction.token, { content: "Pinging..." });
 
-        const msg = await app.api.webhooks.getMessage(app.config.id, interaction.token, "@original");
+        const msg = await app.api.webhooks.getMessage(app.config.clientId, interaction.token, "@original");
 
-        await app.api.interactions.editReply(app.config.id, interaction.token, {
+        await app.api.interactions.editReply(app.config.clientId, interaction.token, {
             content: `Round-trip: \`${timeFromSnowflake(msg.id) - timeFromSnowflake(interaction.id)}\`ms`
         });
     },

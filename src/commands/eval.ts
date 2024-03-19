@@ -37,7 +37,7 @@ export default new Command({
             };
 
             const msg = await app.api.interactions.reply(interaction.id, interaction.token, msgPayload)
-                .then(() => app.api.webhooks.getMessage(app.config.id, interaction.token, "@original"))
+                .then(() => app.api.webhooks.getMessage(app.config.clientId, interaction.token, "@original"))
                 .catch(() => app.api.channels.createMessage(interaction.channel.id, msgPayload));
 
             new utilities.Collector(app, { filter: (int) => int.member?.user.id === interaction.member?.user.id, max: 1 })

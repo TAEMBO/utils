@@ -20,6 +20,6 @@ for await (const file of await readdir(join(process.cwd(), "commands"))) {
     commands.push(command.default.data.toJSON());
 }
 
-await rest.put(Routes.applicationCommands(config.id), { body: commands.map(x => ({ ...x, integration_types: [1], contexts: [0, 1, 2] })) })
+await rest.put(Routes.applicationCommands(config.clientId), { body: commands.map(x => ({ ...x, integration_types: [1], contexts: [0, 1, 2] })) })
     .then(data => console.log("Application commands registered", data))
     .catch(console.error);
