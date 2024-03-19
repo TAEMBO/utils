@@ -7,7 +7,7 @@ import { REST } from "@discordjs/rest";
 import { Collection } from "@discordjs/collection";
 import { verifyKeyMiddleware } from "discord-interactions";
 import { API, InteractionType, InteractionResponseType, APIBaseInteraction, APIChatInputApplicationCommandInteraction, ApplicationCommandType } from "@discordjs/core/http-only";
-import { OptionResolver } from "./utilities.js";
+import { OptionResolver, log } from "./utilities.js";
 import { Command } from "./structures/command.js";
 
 export default new class App extends EventEmitter {
@@ -36,7 +36,7 @@ export default new class App extends EventEmitter {
             this.commands.set(command.default.data.name, command.default);
         }
 
-        this.express.post(`/${this.config.publicKey}`, verifyKeyMiddleware(this.config.publicKey), (req, res) => {
+        this.express.post(`/${this.config.publicKey}`, verifyKeyMiddleware(this.config.publicKey), async (req, res) => {
             const interaction: APIBaseInteraction<InteractionType, any> = req.body;
             
             if (interaction.type === InteractionType.Ping) {
@@ -45,10 +45,17 @@ export default new class App extends EventEmitter {
                 return interaction.type === InteractionType.ApplicationCommand && interaction.data.type === ApplicationCommandType.ChatInput;
             })(interaction)) {
                 const command = this.commands.get(interaction.data.name);
-
+                const options = new OptionResolver(interaction.data.options ?? [], interaction.data.resolved ?? {});
+                
                 if (!command) return;
+                
+                log("White", [
+                    `${(interaction.member ?? interaction).user!.username}\x1b[37m used `,
+                    `/${interaction.data.name} ${options.getSubcommand(false) ?? ""}\x1b[37m in `,
+                    `#${interaction.channel?.name ?? interaction.channel.id}`
+                ].join("\x1b[32m"));
 
-                command.run(this, interaction, new OptionResolver(interaction.data.options ?? [], interaction.data.resolved ?? {}));
+                await command.run(this, interaction, options);
             }
 
             this.emit("interaction", interaction);
