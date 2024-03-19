@@ -1,6 +1,7 @@
 export * from './utils/Collector.js';
 export * from './structures/optionResolver.js';
 export * from './utils/formatString.js';
+export * from './utils/formatTime.js';
 export * from './utils/formatUser.js';
 export * from './utils/getApplicationFlags.js';
 export * from './utils/log.js';
