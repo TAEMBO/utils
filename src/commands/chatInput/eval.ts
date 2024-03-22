@@ -3,10 +3,10 @@ import * as Builders from "@discordjs/builders";
 import { performance } from "node:perf_hooks";
 import { setTimeout as sleep } from "node:timers/promises";
 import { formatWithOptions } from "node:util";
-import { Command } from "../structures/command.js";
-import * as utils from "../utilities.js";
+import { ChatInputCommand } from "../../structures/index.js";
+import * as utils from "../../utilities.js";
 
-export default new Command({
+export default new ChatInputCommand({
     async run(app, interaction, options) {
         await app.api.interactions.defer(interaction.id, interaction.token);
 

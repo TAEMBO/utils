@@ -1,8 +1,8 @@
-import { timeFromSnowflake } from "../utilities.js";
+import { timeFromSnowflake } from "../../utilities.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { Command } from "../structures/command.js";
+import { ChatInputCommand } from "../../structures/index.js";
 
-export default new Command({
+export default new ChatInputCommand({
     async run(app, interaction) {
         await app.api.interactions.reply(interaction.id, interaction.token, { content: "Pinging..." });
 

@@ -6,14 +6,24 @@ import config from './config.json' assert { type: "json" };
 import { REST } from "@discordjs/rest";
 import { Collection } from "@discordjs/collection";
 import { verifyKeyMiddleware } from "discord-interactions";
-import { API, InteractionType, InteractionResponseType, APIBaseInteraction, APIChatInputApplicationCommandInteraction, ApplicationCommandType } from "@discordjs/core/http-only";
-import { OptionResolver, log } from "./utilities.js";
-import { Command } from "./structures/command.js";
+import {
+    APIInteraction,
+    API,
+    APIContextMenuInteraction,
+    APIChatInputApplicationCommandInteraction,
+    ApplicationCommandType,
+    InteractionResponseType,
+    InteractionType
+} from "@discordjs/core/http-only";
+import { ChatInputOptionResolver, log } from "./utilities.js";
+import { ChatInputCommand, ContextMenuCommand } from "./structures/index.js";
+import { ContextMenuCommandBuilder } from "@discordjs/builders";
 
 export default new class App extends EventEmitter {
     readonly config = config;
     readonly express = Express();
-    readonly commands = new Collection<string, Command>();
+    readonly chatInputCommands = new Collection<string, ChatInputCommand>();
+    readonly contextMenuCommands = new Collection<string, ContextMenuCommand<"message" | "user">>();
     readonly api = new API(new REST().setToken(this.config.token));
 
     constructor() {
@@ -24,39 +34,76 @@ export default new class App extends EventEmitter {
     }
 
     private async init() {
-        for (const file of await readdir(resolve("./commands"))) {
-            const command = await import(`./commands/${file}`);
+        for await (const folder of await readdir(resolve("./commands"))) {
+            for await (const file of await readdir(resolve("./commands", folder))) {
+                const commandFile = await import(`./commands/${folder}/${file}`);
 
-            if (!(command.default instanceof Command)) {
-                log("Red", `${file} not instance of Command`);
+                if (
+                    !(commandFile.default instanceof ChatInputCommand)
+                    && !(commandFile.default instanceof ContextMenuCommand)
+                ) {
+                    log("Red", `${file} not instance of Command`);
+    
+                    continue;
+                }
 
-                continue;
-            }
+                const collectionType = commandFile.default.data instanceof ContextMenuCommandBuilder ? "contextMenuCommands": "chatInputCommands";
         
-            this.commands.set(command.default.data.name, command.default);
+                this[collectionType].set(commandFile.default.data.name, commandFile.default);
+            }
         }
 
         this.express.post(`/${this.config.publicKey}`, verifyKeyMiddleware(this.config.publicKey), async (req, res) => {
-            const interaction: APIBaseInteraction<InteractionType, any> = req.body;
-            
-            if (interaction.type === InteractionType.Ping) {
-                return res.send({ type: InteractionResponseType.Pong });
-            } else if (((int: typeof interaction): int is APIChatInputApplicationCommandInteraction => {
-                return interaction.type === InteractionType.ApplicationCommand && interaction.data.type === ApplicationCommandType.ChatInput;
-            })(interaction)) {
-                const command = this.commands.get(interaction.data.name);
-                const options = new OptionResolver(interaction.data.options ?? [], interaction.data.resolved ?? {});
-                
-                if (!command) return;
-                
-                log("White", [
-                    `\x1b[32m${(interaction.member ?? interaction).user!.username}\x1b[37m used `,
-                    `/${interaction.data.name} ${options.getSubcommand(false) ?? ""}\x1b[37m in `,
-                    `#${interaction.channel?.name ?? interaction.channel.id}`
-                ].join("\x1b[32m"));
+            const interaction: APIInteraction = req.body;
 
-                await command.run(this, interaction, options);
-            }
+            switch (interaction.type) {
+                case InteractionType.Ping:
+                    res.send({ type: InteractionResponseType.Pong });
+                    break;
+                case InteractionType.ApplicationCommand:
+                    switch (interaction.data.type) {
+                        case ApplicationCommandType.ChatInput:
+                            const chatInputInt = interaction as APIChatInputApplicationCommandInteraction;
+                            const chatInputCmd = this.chatInputCommands.get(interaction.data.name);
+                            const chatInputOpts = new ChatInputOptionResolver(interaction.data.options ?? [], interaction.data.resolved ?? {});
+                            
+                            if (!chatInputCmd) return;
+                            
+                            log("White", [
+                                `\x1b[32m${(interaction.member ?? interaction).user!.username}\x1b[37m used `,
+                                `/${interaction.data.name} ${chatInputOpts.getSubcommand(false) ?? ""}\x1b[37m in `,
+                                `#${interaction.channel?.name ?? interaction.channel.id}`
+                            ].join("\x1b[32m"));
+            
+                            await chatInputCmd.run(this, chatInputInt, chatInputOpts);
+                            break;
+                        default:
+                            const contextMenuInt = interaction as APIContextMenuInteraction;
+                            const contextMenuCmd = this.contextMenuCommands.get(interaction.data.name);
+                            
+                            if (!contextMenuCmd) return;
+                            
+                            log("White", [
+                                `\x1b[32m${(interaction.member ?? interaction).user!.username}\x1b[37m used `,
+                                `/${interaction.data.name}\x1b[37m in `,
+                                `#${interaction.channel?.name ?? interaction.channel.id}`
+                            ].join("\x1b[32m"));
+            
+                            await contextMenuCmd.run(this, contextMenuInt);
+                            break;
+                    }
+
+                    break;
+                case InteractionType.MessageComponent:
+                    log("Yellow", "MessageComponent not implemented");
+                    break;
+                case InteractionType.ApplicationCommandAutocomplete:
+                    log("Yellow", "ApplicationCommandAutocomplete not implemented");
+                    break;
+                case InteractionType.ModalSubmit:
+                    log("Yellow", "ModalSubmit not implemented");
+                    break;
+            };
 
             this.emit("interaction", interaction);
         }).listen(config.port, config.hostname, () => log("Blue", `Live on \x1b[33m${config.port}\x1b[34m at \x1b[33m/${this.config.publicKey}`));

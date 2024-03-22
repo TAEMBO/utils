@@ -1,6 +1,6 @@
 import { EmbedBuilder, SlashCommandBuilder } from "@discordjs/builders";
-import { formatString } from "../utilities.js";
-import { Command } from "../structures/command.js";
+import { formatString } from "../../utilities.js";
+import { ChatInputCommand } from "../../structures/index.js";
 
 interface Quantity {
     readonly name: string;
@@ -188,7 +188,7 @@ function findUnit(unitNameQuery: string) {
     }
 }
 
-export default new Command({
+export default new ChatInputCommand({
     async run(app, interaction, options) {
         if (options.getSubcommand() === "help") {
             const chosenQuantity = options.getString("quantity", false);

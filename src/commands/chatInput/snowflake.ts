@@ -1,8 +1,8 @@
-import { timeFromSnowflake } from "../utilities.js";
-import { EmbedBuilder, SlashCommandBuilder } from "@discordjs/builders";
-import { Command } from "../structures/command.js";
+import { timeFromSnowflake } from "../../utilities.js";
+import { SlashCommandBuilder } from "@discordjs/builders";
+import { ChatInputCommand } from "../../structures/index.js";
 
-export default new Command({
+export default new ChatInputCommand({
     async run(app, interaction, options) {
         const snowflake = options.getString("snowflake", true);
         

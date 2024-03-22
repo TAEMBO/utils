@@ -1,10 +1,10 @@
-import { formatUser, getApplicationFlags, timeFromSnowflake } from "../utilities.js";
+import { formatUser, getApplicationFlags, timeFromSnowflake } from "../../utilities.js";
 import { EmbedBuilder, SlashCommandBuilder } from "@discordjs/builders";
-import { Command } from "../structures/command.js";
-import { APIEmbedField, ImageFormat } from "@discordjs/core/http-only";
-import { ApplicationRPC } from "../typings.js";
+import { APIEmbedField } from "@discordjs/core/http-only";
+import { ChatInputCommand } from "../../structures/index.js";
+import { ApplicationRPC } from "../../typings.js";
 
-export default new Command({
+export default new ChatInputCommand({
     async run(app, interaction, options) {
         async function getApplicationData(id: string) {
             const applicationData = await app.api.rest.get(`/applications/${id}/rpc`).catch(() => null) as ApplicationRPC | null;

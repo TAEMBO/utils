@@ -17,7 +17,7 @@ import {
 /**
  * A resolver for command interaction options.
  */
-export class OptionResolver {
+export class ChatInputOptionResolver {
     private _group: string | null;
     private _subcommand: string | null;
     private _hoistedOptions: any[];
