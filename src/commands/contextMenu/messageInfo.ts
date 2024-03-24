@@ -12,6 +12,6 @@ export default new ContextMenuCommand<"message">({
         });
     },
     data: new ContextMenuCommandBuilder()
-        .setName("Info")
+        .setName("Message Info")
         .setType(ApplicationCommandType.Message)
 });
