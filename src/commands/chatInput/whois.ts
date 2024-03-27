@@ -1,6 +1,6 @@
-import { formatUser, getApplicationFlags, timeFromSnowflake } from "../../utilities.js";
+import { formatUser, getApplicationFlags, getUserFlags, timeFromSnowflake } from "../../utilities.js";
 import { EmbedBuilder, SlashCommandBuilder } from "@discordjs/builders";
-import { APIEmbedField } from "@discordjs/core/http-only";
+import { APIEmbedField, UserPremiumType } from "@discordjs/core/http-only";
 import { ChatInputCommand } from "../../structures/index.js";
 import { ApplicationRPC } from "../../typings.js";
 
@@ -42,7 +42,11 @@ export default new ChatInputCommand({
                 .setTitle(`${user.bot ? "Bot" : "User"} info: ${user.username}`)
                 .setURL(`https://discord.com/users/${user.id}`)
                 .setDescription(formatUser(user))
-                .addFields({ name: `🔹 ${user.bot ? "Bot" : "Account"} created`, value: `<t:${Math.round(timeFromSnowflake(user.id) / 1_000)}:R>` })
+                .addFields(
+                    { name: `🔹 ${user.bot ? "Bot" : "Account"} created`, value: `<t:${Math.round(timeFromSnowflake(user.id) / 1_000)}:R>` },
+                    { name: "🔹 Premium type", value: UserPremiumType[user.premium_type ?? 0] },
+                    { name: "🔹 Flags", value: getUserFlags(user.flags ?? 0).join(", ") || "None" }
+                )
                 .setColor(parseInt("4023fc", 16))
                 .setImage(user.banner ? app.api.rest.cdn.banner(user.id, user.banner, { extension: "png", size: 1024 }) : null);
 
@@ -69,7 +73,9 @@ export default new ChatInputCommand({
                             .join(member.roles.length > 4 ? " " : "\n")
                             .slice(0, 1024)
                         : "None"
-                }
+                },
+                { name: "🔹 Premium type", value: UserPremiumType[user.premium_type ?? 0], inline: true },
+                { name: "🔹 Flags", value: getUserFlags(user.flags ?? 0).join(", ") || "None", inline: true }
             )
             .setColor(parseInt("4023fc", 16))
             .setImage(user.banner ? app.api.rest.cdn.banner(user.id, user.banner, { extension: "png", size: 1024 }) : null)
