@@ -15,9 +15,10 @@ import {
     InteractionResponseType,
     InteractionType
 } from "@discordjs/core/http-only";
-import { ChatInputOptionResolver, log } from "./utilities.js";
+import { log } from "./utilities.js";
 import { ChatInputCommand, ContextMenuCommand } from "./structures/index.js";
 import { ContextMenuCommandBuilder } from "@discordjs/builders";
+import { InteractionOptionResolver } from "@sapphire/discord-utilities";
 
 export default new class App extends EventEmitter {
     readonly config = config;
@@ -61,35 +62,34 @@ export default new class App extends EventEmitter {
                     res.send({ type: InteractionResponseType.Pong });
                     break;
                 case InteractionType.ApplicationCommand:
+                    const options = new InteractionOptionResolver(interaction);
+
                     switch (interaction.data.type) {
                         case ApplicationCommandType.ChatInput:
-                            const chatInputInt = interaction as APIChatInputApplicationCommandInteraction;
                             const chatInputCmd = this.chatInputCommands.get(interaction.data.name);
-                            const chatInputOpts = new ChatInputOptionResolver(interaction.data.options ?? [], interaction.data.resolved ?? {});
                             
-                            if (!chatInputCmd) return;
+                            if (!chatInputCmd) return log("Red", `Command ${interaction.data.name} not found`);
                             
                             log("White", [
                                 `\x1b[32m${(interaction.member ?? interaction).user!.username}\x1b[37m used `,
-                                `/${interaction.data.name} ${chatInputOpts.getSubcommand(false) ?? ""}\x1b[37m in `,
+                                `/${interaction.data.name} ${options.getSubcommand(false) ?? ""}\x1b[37m in `,
                                 `#${interaction.channel?.name ?? interaction.channel.id}`
                             ].join("\x1b[32m"));
             
-                            await chatInputCmd.run(this, chatInputInt, chatInputOpts);
+                            await chatInputCmd.run(this, interaction as APIChatInputApplicationCommandInteraction, options);
                             break;
                         default:
-                            const contextMenuInt = interaction as APIContextMenuInteraction;
                             const contextMenuCmd = this.contextMenuCommands.get(interaction.data.name);
                             
-                            if (!contextMenuCmd) return;
+                            if (!contextMenuCmd) return log("Red", `Command ${interaction.data.name} not found`);
                             
                             log("White", [
                                 `\x1b[32m${(interaction.member ?? interaction).user!.username}\x1b[37m used `,
-                                `/${interaction.data.name}\x1b[37m in `,
-                                `#${interaction.channel?.name ?? interaction.channel.id}`
+                                `${interaction.data.name}\x1b[37m in `,
+                                `#${interaction.channel.name ?? interaction.channel.id}`
                             ].join("\x1b[32m"));
             
-                            await contextMenuCmd.run(this, contextMenuInt);
+                            await contextMenuCmd.run(this, interaction as APIContextMenuInteraction, options);
                             break;
                     }
 

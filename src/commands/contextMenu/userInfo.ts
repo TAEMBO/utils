@@ -4,10 +4,11 @@ import { formatWithOptions } from "node:util";
 import { ContextMenuCommand } from "../../structures/index.js";
 
 export default new ContextMenuCommand<"user">({
-    async run(app, interaction) {
+    async run(app, interaction, options) {
         const targetUser = await app.api.users.get(interaction.data.target_id);
-        const targetMember = interaction.data.resolved.members?.[interaction.data.target_id] && {
-            ...interaction.data.resolved.members[interaction.data.target_id],
+        const resolvedMember = options.getTargetMember();
+        const targetMember = resolvedMember && {
+            ...resolvedMember,
             user: targetUser
         };
 

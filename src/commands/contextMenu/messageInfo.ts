@@ -4,8 +4,8 @@ import { formatWithOptions } from "node:util";
 import { ContextMenuCommand } from "../../structures/index.js";
 
 export default new ContextMenuCommand<"message">({
-    async run(app, interaction) {
-        const targetMessage = interaction.data.resolved.messages[interaction.data.target_id];
+    async run(app, interaction, options) {
+        const targetMessage = options.getTargetMessage();
 
         await app.api.interactions.reply(interaction.id, interaction.token, {
             content: `\`\`\`js\n${formatWithOptions({ depth: 5 }, "%O", targetMessage).slice(0, 1990)}\`\`\``

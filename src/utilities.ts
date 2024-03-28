@@ -1,5 +1,4 @@
 export * from './utils/Collector.js';
-export * from './structures/chatInputOptionResolver.js';
 export * from './utils/formatString.js';
 export * from './utils/formatTime.js';
 export * from './utils/formatUser.js';
