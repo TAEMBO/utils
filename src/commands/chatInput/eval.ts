@@ -44,7 +44,11 @@ export default new ChatInputCommand({
 
             await app.api.interactions.editReply(app.config.clientId, interaction.token, msgPayload);
 
-            new utils.Collector(app, { filter: int => (int.member ?? int).user!.id === (interaction.member ?? interaction).user!.id, max: 1 })
+            new utils.Collector(app, {
+                filter: int => (int.member ?? int).user!.id === (interaction.member ?? interaction).user!.id,
+                max: 1,
+                timeout: 60_000
+            })
                 .on("collect", int => app.api.interactions.reply(int.id, int.token, { content: `\`\`\`\n${err.stack.slice(0, 1950)}\`\`\`` }))
                 .on("end", () => app.api.interactions.editReply(app.config.clientId, interaction.token, { components: [] }));
 
