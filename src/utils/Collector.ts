@@ -1,58 +1,48 @@
 import { EventEmitter } from "node:events";
 import { CollectorOptions } from "../typings.js";
-import { APIBaseInteraction, APIMessageComponentInteraction, InteractionType } from "@discordjs/core/http-only";
+import { type APIInteraction, type APIMessageComponentInteraction, InteractionType } from "@discordjs/core/http-only";
 import App from "../app.js";
 
 declare interface Collector {
-    on(event: 'collect', listener: (args: APIBaseInteraction<InteractionType, any>) => any): this;
-    on(event: 'end', listener: (args: APIBaseInteraction<InteractionType, any>[]) => any): this;
+    on(event: 'collect', listener: (args: APIMessageComponentInteraction) => any): this;
+    on(event: 'end', listener: (args: APIMessageComponentInteraction[], reason: string) => any): this;
 }
 
 class Collector extends EventEmitter {  
-    collected: APIBaseInteraction<InteractionType, any>[];
-    timer: NodeJS.Timeout | undefined;
-    filter: (int: APIMessageComponentInteraction) => any;
+    private collected: APIMessageComponentInteraction[] = [];
+    private timer: NodeJS.Timeout | undefined;
+    private filter: (int: APIMessageComponentInteraction) => boolean;
 
     constructor(private app: typeof App, private options: CollectorOptions = {}) {
         super();
-        this.collected = [];
         this.filter = options.filter ?? (() => true);
         this.timer = options.timeout ? setTimeout(() => this.end("timeout"), options.timeout) : undefined;
+        
+        this.listener = this.listener.bind(this);
 
-        app.addListener("interaction", (value: APIMessageComponentInteraction) => {
-            if (value.type !== InteractionType.MessageComponent) return;
-            
-            this.emit("collect", value);
-
-            this.collected.push(value);
-            
-            if (options.max && this.collected.length === options.max) {
-                this.end("max");
-            }
-        });
+        app.addListener("interaction", this.listener);
     }
 
-    resetTimer(newTimeout?: number) {
+    private listener(int: APIInteraction) {
+        if (int.type !== InteractionType.MessageComponent) return;
+
+        const passesFilter = this.filter(int);
+
+        if (!passesFilter) return;
+
+        this.emit("collect", int);
+
+        this.collected.push(int);
+
+        if (this.options.max && this.collected.length >= this.options.max) this.end("max");
+    }
+
+    private end(reason: string) {
+        this.app.removeListener("interaction", this.listener);
+
         clearTimeout(this.timer);
-        this.timer = setTimeout(() => {
-            this.end("timeout");
-        }, newTimeout ?? this.options?.timeout);
-    }
 
-    collection(...args: APIMessageComponentInteraction[]) {
-        const pass = this.filter(args[0]);
-        if (!pass) return;
-        this.emit("collect", args[0]);
-        this.collected.push(args[0]); 
-        if (this.collected && this.collected.length === this.options?.max) {
-            this.end();
-        }
-    }
-    end(reason?: string) {
-        this.app.removeListener("interaction", this.collection);
-        clearTimeout(this.timer);
-        this.emit("end", this.collected);
-        return true;
+        this.emit("end", this.collected, reason);
     }
 }
 

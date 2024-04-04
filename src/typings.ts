@@ -2,7 +2,7 @@ import { type SlashCommandBuilder, type SlashCommandSubcommandsOnlyBuilder } fro
 import { type APIMessageComponentInteraction } from "@discordjs/core/http-only";
 
 export interface CollectorOptions {
-    filter?: (int: APIMessageComponentInteraction) => any;
+    filter?: (int: APIMessageComponentInteraction) => boolean;
     max?: number;
     timeout?: number;
 };
