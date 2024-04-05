@@ -57,6 +57,8 @@ export default new class App extends EventEmitter {
         this.express.post(`/${this.config.publicKey}`, verifyKeyMiddleware(this.config.publicKey), async (req, res) => {
             const interaction: APIInteraction = req.body;
 
+            this.emit("interaction", interaction);
+
             switch (interaction.type) {
                 case InteractionType.Ping:
                     res.send({ type: InteractionResponseType.Pong });
@@ -91,7 +93,7 @@ export default new class App extends EventEmitter {
             
                             await contextMenuCmd.run(this, interaction as APIContextMenuInteraction, options);
                             break;
-                    }
+                    };
 
                     break;
                 case InteractionType.MessageComponent:
@@ -105,7 +107,6 @@ export default new class App extends EventEmitter {
                     break;
             };
 
-            this.emit("interaction", interaction);
         }).listen(config.port, config.hostname, () => log("Blue", `Live on \x1b[33m${config.port}\x1b[34m at \x1b[33m/${this.config.publicKey}`));
     }
 }();
