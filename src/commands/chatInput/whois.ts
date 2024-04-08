@@ -1,6 +1,6 @@
 import { formatUser, getApplicationFlags, getUserFlags, timeFromSnowflake } from "../../utilities.js";
 import { EmbedBuilder, SlashCommandBuilder } from "@discordjs/builders";
-import { APIEmbedField, UserPremiumType } from "@discordjs/core/http-only";
+import { APIEmbedField } from "@discordjs/core/http-only";
 import { ChatInputCommand } from "../../structures/index.js";
 import { ApplicationRPC } from "../../typings.js";
 
