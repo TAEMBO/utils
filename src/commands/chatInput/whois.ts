@@ -44,7 +44,6 @@ export default new ChatInputCommand({
                 .setDescription(formatUser(user))
                 .addFields(
                     { name: `🔹 ${user.bot ? "Bot" : "Account"} created`, value: `<t:${Math.round(timeFromSnowflake(user.id) / 1_000)}:R>` },
-                    { name: "🔹 Premium type", value: UserPremiumType[user.premium_type ?? 0] },
                     { name: "🔹 Flags", value: getUserFlags(user.flags ?? 0).join(", ") || "None" }
                 )
                 .setColor(parseInt("4023fc", 16))
@@ -74,7 +73,6 @@ export default new ChatInputCommand({
                             .slice(0, 1024)
                         : "None"
                 },
-                { name: "🔹 Premium type", value: UserPremiumType[user.premium_type ?? 0], inline: true },
                 { name: "🔹 Flags", value: getUserFlags(user.flags ?? 0).join(", ") || "None", inline: true }
             )
             .setColor(parseInt("4023fc", 16))
