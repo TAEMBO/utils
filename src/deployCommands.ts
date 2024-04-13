@@ -22,10 +22,14 @@ for await (const folder of await readdir(resolve("./commands"))) {
             continue;
         }
 
-        commands.push(commandFile.default.data.toJSON());
+        commands.push({
+            ...commandFile.default.data.toJSON(),
+            integration_types: [1],
+            contexts: [0, 1, 2]
+        });
     }
 }
  
-await rest.put(Routes.applicationCommands(config.clientId), { body: commands.map(x => ({ ...x, integration_types: [1], contexts: [0, 1, 2] })) })
+await rest.put(Routes.applicationCommands(config.clientId), { body: commands })
     .then(data => log("Purple", "Application commands registered", data))
     .catch(console.error);
