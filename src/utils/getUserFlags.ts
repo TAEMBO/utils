@@ -21,4 +21,4 @@ export function getUserFlags(flags: number) {
     }
 
     return newFlags;
-};
+}

@@ -21,4 +21,4 @@ export function getApplicationFlags(flags: number) {
     }
 
     return newFlags;
-};
+}

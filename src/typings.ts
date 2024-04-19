@@ -5,7 +5,7 @@ export interface CollectorOptions {
     filter?: (int: APIMessageComponentInteraction) => boolean;
     max?: number;
     timeout?: number;
-};
+}
 
 export type CombinedSlashCommandBuilder = Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup"> | SlashCommandSubcommandsOnlyBuilder;
 

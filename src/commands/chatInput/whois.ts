@@ -1,8 +1,8 @@
-import { formatUser, getApplicationFlags, getUserFlags, timeFromSnowflake } from "../../utilities.js";
 import { EmbedBuilder, SlashCommandBuilder } from "@discordjs/builders";
-import { APIEmbedField } from "@discordjs/core/http-only";
+import type { APIEmbedField } from "@discordjs/core/http-only";
 import { ChatInputCommand } from "../../structures/index.js";
-import { ApplicationRPC } from "../../typings.js";
+import { formatUser, getApplicationFlags, getUserFlags, timeFromSnowflake } from "../../utilities.js";
+import type { ApplicationRPC } from "../../typings.js";
 
 export default new ChatInputCommand({
     async run(app, interaction, options) {
@@ -78,7 +78,6 @@ export default new ChatInputCommand({
             .setColor(parseInt("4023fc", 16))
             .setImage(user.banner ? app.api.rest.cdn.banner(user.id, user.banner, { extension: "png", size: 1024 }) : null)
         );
-
 
         if (member.premium_since) embeds[0].addFields([{
             name: "🔹 Server Boosting Since",

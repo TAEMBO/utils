@@ -1,19 +1,20 @@
-import { EventEmitter } from "node:events";
-import { CollectorOptions } from "../typings.js";
+/* eslint-disable @typescript-eslint/no-unsafe-declaration-merging */
 import { type APIInteraction, type APIMessageComponentInteraction, InteractionType } from "@discordjs/core/http-only";
-import App from "../app.js";
+import { EventEmitter } from "node:events";
+import type App from "../app.js";
+import { CollectorOptions } from "../typings.js";
 
 declare interface Collector {
-    on(event: 'collect', listener: (args: APIMessageComponentInteraction) => any): this;
-    on(event: 'end', listener: (args: APIMessageComponentInteraction[], reason: string) => any): this;
+    on(event: "collect", listener: (args: APIMessageComponentInteraction) => any): this;
+    on(event: "end", listener: (args: APIMessageComponentInteraction[], reason: string) => any): this;
 }
 
-class Collector extends EventEmitter {  
+class Collector extends EventEmitter {
     private collected: APIMessageComponentInteraction[] = [];
     private timer: NodeJS.Timeout | undefined;
     private filter: (int: APIMessageComponentInteraction) => boolean;
 
-    constructor(private app: typeof App, private options: CollectorOptions = {}) {
+    public constructor(private app: typeof App, private options: CollectorOptions = {}) {
         super();
         this.filter = options.filter ?? (() => true);
         this.timer = options.timeout ? setTimeout(() => this.end("timeout"), options.timeout) : undefined;

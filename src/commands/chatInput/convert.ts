@@ -1,6 +1,6 @@
 import { EmbedBuilder, SlashCommandBuilder } from "@discordjs/builders";
-import { formatString } from "../../utilities.js";
 import { ChatInputCommand } from "../../structures/index.js";
+import { formatString } from "../../utilities.js";
 
 interface Quantity {
     readonly name: string;
@@ -221,9 +221,9 @@ export default new ChatInputCommand({
                             "An argument: \"180cm\", \"12.99€\", \"5km\", \"16fl oz\"",
                             "A target unit: \"km\", \"c\", \"m2\"",
                             "Complete conversion examples:",
-                            `\`/convert convert\` \`5ft, 8in\` & \`cm\``,
-                            `\`/convert convert\` \`300kelvin\` & \`celsius\``,
-                            `\`/convert convert\` \`57mm, 3.3cm, 0.4m\` & \`cm\``
+                            "`/convert convert` `5ft, 8in` & `cm`",
+                            "`/convert convert` `300kelvin` & `celsius`",
+                            "`/convert convert` `57mm, 3.3cm, 0.4m` & `cm`"
                         ].join("\n")
                     }
                 )

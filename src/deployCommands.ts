@@ -1,5 +1,5 @@
-import { REST } from "@discordjs/rest";
 import { type RESTPostAPIChatInputApplicationCommandsJSONBody, Routes } from "@discordjs/core/http-only";
+import { REST } from "@discordjs/rest";
 import { readdir } from "node:fs/promises";
 import { resolve } from "node:path";
 import config from "./config.json" assert { type: "json" };

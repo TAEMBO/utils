@@ -1,6 +1,6 @@
-import { timeFromSnowflake } from "../../utilities.js";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { ChatInputCommand } from "../../structures/index.js";
+import { timeFromSnowflake } from "../../utilities.js";
 
 export default new ChatInputCommand({
     async run(app, interaction, options) {

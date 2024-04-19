@@ -2,7 +2,7 @@ import Express from "express";
 import { readdir } from "node:fs/promises";
 import { resolve } from "node:path";
 import { EventEmitter } from "node:events";
-import config from './config.json' assert { type: "json" };
+import config from "./config.json" assert { type: "json" };
 import { REST } from "@discordjs/rest";
 import { Collection } from "@discordjs/collection";
 import { verifyKeyMiddleware } from "discord-interactions";
@@ -21,15 +21,15 @@ import { ContextMenuCommandBuilder } from "@discordjs/builders";
 import { InteractionOptionResolver } from "@sapphire/discord-utilities";
 
 export default new class App extends EventEmitter {
-    readonly config = config;
-    readonly express = Express();
-    readonly chatInputCommands = new Collection<string, ChatInputCommand>();
-    readonly contextMenuCommands = new Collection<string, ContextMenuCommand<"message" | "user">>();
-    readonly api = new API(new REST().setToken(this.config.token));
+    public readonly config = config;
+    public readonly express = Express();
+    public readonly chatInputCommands = new Collection<string, ChatInputCommand>();
+    public readonly contextMenuCommands = new Collection<string, ContextMenuCommand<"message" | "user">>();
+    public readonly api = new API(new REST().setToken(this.config.token));
 
-    constructor() {
+    public constructor() {
         super();
-        this.init();
+        this.init().catch(console.error);
 
         process.on("uncaughtException", console.log);
     }
@@ -63,11 +63,11 @@ export default new class App extends EventEmitter {
                 case InteractionType.Ping:
                     res.send({ type: InteractionResponseType.Pong });
                     break;
-                case InteractionType.ApplicationCommand:
+                case InteractionType.ApplicationCommand: {
                     const options = new InteractionOptionResolver(interaction);
 
                     switch (interaction.data.type) {
-                        case ApplicationCommandType.ChatInput:
+                        case ApplicationCommandType.ChatInput: {
                             const chatInputCmd = this.chatInputCommands.get(interaction.data.name);
                             
                             if (!chatInputCmd) return log("Red", `Command ${interaction.data.name} not found`);
@@ -80,7 +80,8 @@ export default new class App extends EventEmitter {
             
                             await chatInputCmd.run(this, interaction as APIChatInputApplicationCommandInteraction, options);
                             break;
-                        default:
+                        }
+                        default: {
                             const contextMenuCmd = this.contextMenuCommands.get(interaction.data.name);
                             
                             if (!contextMenuCmd) return log("Red", `Command ${interaction.data.name} not found`);
@@ -93,9 +94,11 @@ export default new class App extends EventEmitter {
             
                             await contextMenuCmd.run(this, interaction as APIContextMenuInteraction, options);
                             break;
-                    };
+                        }
+                    }
 
                     break;
+                }
                 case InteractionType.MessageComponent:
                     log("Yellow", "MessageComponent not implemented");
                     break;
@@ -105,7 +108,7 @@ export default new class App extends EventEmitter {
                 case InteractionType.ModalSubmit:
                     log("Yellow", "ModalSubmit not implemented");
                     break;
-            };
+            }
 
         }).listen(config.port, config.hostname, () => log("Blue", `Live on \x1b[33m${config.port}\x1b[34m at \x1b[33m/${this.config.publicKey}`));
     }

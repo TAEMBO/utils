@@ -1,7 +1,7 @@
-import type { APIUserApplicationCommandInteraction, APIMessageApplicationCommandInteraction } from "@discordjs/core/http-only";
 import type { ContextMenuCommandBuilder } from "@discordjs/builders";
-import type App from "../app.js";
+import type { APIUserApplicationCommandInteraction, APIMessageApplicationCommandInteraction } from "@discordjs/core/http-only";
 import type { InteractionOptionResolver } from "@sapphire/discord-utilities";
+import type App from "../app.js";
 
 /**
  * Creates a new instance of an application command
@@ -13,11 +13,11 @@ export class ContextMenuCommand<
         : APIUserApplicationCommandInteraction,
 > {
     /** The function that is ran for this command */
-    run: (app: typeof App, interaction: TInteraction, options: InteractionOptionResolver) => Promise<any>;
+    public run: (app: typeof App, interaction: TInteraction, options: InteractionOptionResolver) => Promise<any>;
     /** The builder data for this command */
-    readonly data: ContextMenuCommandBuilder;
+    public readonly data: ContextMenuCommandBuilder;
 
-    constructor(commandData: {
+    public constructor(commandData: {
         readonly data: ContextMenuCommandBuilder;
         run(app: typeof App, interaction: TInteraction, options: InteractionOptionResolver): Promise<any>;
     }) {
