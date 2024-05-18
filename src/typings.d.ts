@@ -1,5 +1,5 @@
-import { type SlashCommandBuilder, type SlashCommandSubcommandsOnlyBuilder } from "@discordjs/builders";
-import { type APIMessageComponentInteraction } from "@discordjs/core/http-only";
+import type { SlashCommandBuilder, SlashCommandOptionsOnlyBuilder, SlashCommandSubcommandsOnlyBuilder } from "@discordjs/builders";
+import type { APIMessageComponentInteraction } from "@discordjs/core/http-only";
 
 export interface CollectorOptions {
     filter?: (int: APIMessageComponentInteraction) => boolean;
@@ -7,7 +7,7 @@ export interface CollectorOptions {
     timeout?: number;
 }
 
-export type CombinedSlashCommandBuilder = Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup"> | SlashCommandSubcommandsOnlyBuilder;
+export type CombinedSlashCommandBuilder = SlashCommandOptionsOnlyBuilder | SlashCommandSubcommandsOnlyBuilder;
 
 export interface ApplicationRPC {
     bot_public: boolean;
