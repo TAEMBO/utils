@@ -11,13 +11,13 @@
     "build": "npm run lint && tsc"
   },
   "dependencies": {
-    "@discordjs/builders": "^1.7.0",
-    "@discordjs/collection": "^2.0.0",
-    "@discordjs/core": "^1.1.1",
-    "@discordjs/rest": "^2.2.0",
+    "@discordjs/builders": "^1.8.1",
+    "@discordjs/collection": "^2.1.0",
+    "@discordjs/core": "^1.2.0",
+    "@discordjs/rest": "^2.3.0",
     "@sapphire/discord-utilities": "^3.2.3",
     "discord-interactions": "^3.4.0",
-    "express": "^4.18.2"
+    "express": "^4.19.2"
   },
   "devDependencies": {
     "@types/express": "^4.17.14",
@@ -26,10 +26,5 @@
     "@typescript-eslint/parser": "^7.7.0",
     "eslint": "^8.56.0",
     "typescript": "^5.4.3"
-  },
-  "overrides": {
-    "@sapphire/discord-utilities": {
-      "discord-api-types": "0.37.61"
-    }
   }
 }
