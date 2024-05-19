@@ -9,8 +9,8 @@ import { log } from "./utilities.js";
 const commands: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
 const rest = new REST().setToken(config.token);
 
-for await (const folder of await readdir(resolve("./commands"))) {
-    for await (const file of await readdir(resolve("./commands", folder))) {
+for (const folder of await readdir(resolve("./commands"))) {
+    for (const file of await readdir(resolve("./commands", folder))) {
         const commandFile = await import(`./commands/${folder}/${file}`);
 
         if (
