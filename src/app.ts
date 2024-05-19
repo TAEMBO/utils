@@ -1,4 +1,4 @@
-import Express from "express";
+import Polka from "polka";
 import { readdir } from "node:fs/promises";
 import { resolve } from "node:path";
 import { EventEmitter } from "node:events";
@@ -22,7 +22,7 @@ import { InteractionOptionResolver } from "@sapphire/discord-utilities";
 
 export default new class App extends EventEmitter {
     public readonly config = config;
-    public readonly express = Express();
+    public readonly server = Polka();
     public readonly chatInputCommands = new Collection<string, ChatInputCommand>();
     public readonly contextMenuCommands = new Collection<string, ContextMenuCommand<"message" | "user">>();
     public readonly api = new API(new REST().setToken(this.config.token));
@@ -54,7 +54,7 @@ export default new class App extends EventEmitter {
             }
         }
 
-        this.express.post(`/${this.config.publicKey}`, verifyKeyMiddleware(this.config.publicKey), async (req, res) => {
+        this.server.post(`/${this.config.publicKey}`, verifyKeyMiddleware(this.config.publicKey), async (req, res) => {
             const interaction: APIInteraction = req.body;
 
             this.emit("interaction", interaction);
