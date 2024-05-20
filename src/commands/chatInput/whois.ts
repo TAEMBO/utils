@@ -51,12 +51,13 @@ export default new ChatInputCommand({
 
             if (appData) embed.addFields(...appData);
 
-            return await app.api.interactions.reply(interaction.id, interaction.token, { embeds: [embed.toJSON()], flags: app.ephemeral });
+            return await app.api.interactions.reply(interaction.id, interaction.token, {
+                embeds: [embed.toJSON()],
+                flags: app.ephemeral
+            });
         }
 
-        const embeds: EmbedBuilder[] = [];
-
-        embeds.push(new EmbedBuilder()
+        const embed = new EmbedBuilder()
             .setThumbnail(user.avatar ? app.api.rest.cdn.avatar(user.id, user.avatar, { extension: "png", size: 1024 }) : null)
             .setTitle(`${user.bot ? "Bot" : "Member"} info: ${user.username}`)
             .setURL(`https://discord.com/users/${user.id}`)
@@ -76,10 +77,9 @@ export default new ChatInputCommand({
                 { name: "🔹 Flags", value: getUserFlags(user.flags ?? 0).join(", ") || "None", inline: true }
             )
             .setColor(parseInt("4023fc", 16))
-            .setImage(user.banner ? app.api.rest.cdn.banner(user.id, user.banner, { extension: "png", size: 1024 }) : null)
-        );
+            .setImage(user.banner ? app.api.rest.cdn.banner(user.id, user.banner, { extension: "png", size: 1024 }) : null);
 
-        if (member.premium_since) embeds[0].addFields([{
+        if (member.premium_since) embed.addFields([{
             name: "🔹 Server Boosting Since",
             value: `<t:${Math.round(timeFromSnowflake(member.premium_since) / 1_000)}:R>`,
             inline: true
@@ -88,12 +88,18 @@ export default new ChatInputCommand({
         if (user.bot) {
             const appData = await getApplicationData(user.id);
 
-            if (appData) embeds[0].addFields(...appData);
+            if (appData) embed.addFields(...appData);
 
-            return await app.api.interactions.reply(interaction.id, interaction.token, { embeds: embeds.map(x => x.toJSON()) });
+            return await app.api.interactions.reply(interaction.id, interaction.token, {
+                embeds: [embed.toJSON()],
+                flags: app.ephemeral
+            });
         }
         
-        await app.api.interactions.reply(interaction.id, interaction.token, { embeds: embeds.map(x => x.toJSON()) });
+        await app.api.interactions.reply(interaction.id, interaction.token, {
+            embeds: [embed.toJSON()],
+            flags: app.ephemeral
+        });
     },
     data: new SlashCommandBuilder()
         .setName("whois")
