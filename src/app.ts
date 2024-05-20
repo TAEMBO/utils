@@ -5,7 +5,6 @@ import { EventEmitter } from "node:events";
 import config from "./config.json" assert { type: "json" };
 import { REST } from "@discordjs/rest";
 import { Collection } from "@discordjs/collection";
-import { verifyKeyMiddleware } from "discord-interactions";
 import {
     APIInteraction,
     API,
@@ -15,7 +14,7 @@ import {
     InteractionResponseType,
     InteractionType
 } from "@discordjs/core/http-only";
-import { log } from "./utilities.js";
+import { parser, log, verifyKey } from "./utilities.js";
 import { ChatInputCommand, ContextMenuCommand } from "./structures/index.js";
 import { ContextMenuCommandBuilder } from "@discordjs/builders";
 import { InteractionOptionResolver } from "@sapphire/discord-utilities";
@@ -54,7 +53,7 @@ export default new class App extends EventEmitter {
             }
         }
 
-        this.server.post(`/${this.config.publicKey}`, verifyKeyMiddleware(this.config.publicKey), async (req, res) => {
+        this.server.use(parser, verifyKey).post(`/${this.config.publicKey}`, async (req, res) => {
             const interaction: APIInteraction = req.body;
 
             this.emit("interaction", interaction);
@@ -109,7 +108,6 @@ export default new class App extends EventEmitter {
                     log("Yellow", "ModalSubmit not implemented");
                     break;
             }
-
         }).listen(config.port, config.hostname, () => log("Blue", `Live on \x1b[33m${config.port}\x1b[34m at \x1b[33m/${this.config.publicKey}`));
     }
 }();
