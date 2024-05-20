@@ -6,13 +6,14 @@ import config from "./config.json" assert { type: "json" };
 import { REST } from "@discordjs/rest";
 import { Collection } from "@discordjs/collection";
 import {
-    APIInteraction,
+    type APIInteraction,
     API,
-    APIContextMenuInteraction,
-    APIChatInputApplicationCommandInteraction,
+    type APIContextMenuInteraction,
+    type APIChatInputApplicationCommandInteraction,
     ApplicationCommandType,
     InteractionResponseType,
-    InteractionType
+    InteractionType,
+    type MessageFlags
 } from "@discordjs/core/http-only";
 import { parser, log, verifyKey } from "./utilities.js";
 import { ChatInputCommand, ContextMenuCommand } from "./structures/index.js";
@@ -25,6 +26,7 @@ export default new class App extends EventEmitter {
     public readonly chatInputCommands = new Collection<string, ChatInputCommand>();
     public readonly contextMenuCommands = new Collection<string, ContextMenuCommand<"message" | "user">>();
     public readonly api = new API(new REST().setToken(this.config.token));
+    public ephemeral: undefined | MessageFlags.Ephemeral = undefined;
 
     public constructor() {
         super();

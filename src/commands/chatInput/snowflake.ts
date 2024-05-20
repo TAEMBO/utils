@@ -7,7 +7,8 @@ export default new ChatInputCommand({
         const snowflake = options.getString("snowflake", true);
         
         if (!Number(snowflake)) return await app.api.interactions.reply(interaction.id, interaction.token, {
-            content: "Invalid snowflake provided"
+            content: "Invalid snowflake provided",
+            flags: app.ephemeral
         });
 
         const unixTime = Math.round(timeFromSnowflake(snowflake) / 1_000);

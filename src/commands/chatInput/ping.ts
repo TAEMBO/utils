@@ -4,7 +4,7 @@ import { timeFromSnowflake } from "../../utilities.js";
 
 export default new ChatInputCommand({
     async run(app, interaction) {
-        await app.api.interactions.reply(interaction.id, interaction.token, { content: "Pinging..." });
+        await app.api.interactions.reply(interaction.id, interaction.token, { content: "Pinging...", flags: app.ephemeral });
 
         const msg = await app.api.webhooks.getMessage(app.config.clientId, interaction.token, "@original");
 

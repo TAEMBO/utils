@@ -8,7 +8,7 @@ import * as utils from "../../utilities.js";
 
 export default new ChatInputCommand({
     async run(app, interaction, options) {
-        await app.api.interactions.defer(interaction.id, interaction.token);
+        await app.api.interactions.defer(interaction.id, interaction.token, { flags: app.ephemeral });
 
         sleep;
         const code = options.getString("code", true);
@@ -33,23 +33,22 @@ export default new ChatInputCommand({
                     value: `\`\`\`\n${err}\`\`\``
                 });
 
-            const msgPayload = {
+            await app.api.interactions.editReply(app.config.clientId, interaction.token, {
                 embeds: [embed.toJSON()],
                 components: [new Builders.ActionRowBuilder<Builders.ButtonBuilder>().addComponents(new Builders.ButtonBuilder()
                     .setCustomId("stack")
                     .setStyle(Discord.ButtonStyle.Primary)
                     .setLabel("Stack")
                 ).toJSON()],
-            };
-
-            await app.api.interactions.editReply(app.config.clientId, interaction.token, msgPayload);
+                flags: app.ephemeral
+            });
 
             new utils.Collector(app, {
                 filter: int => (int.member ?? int).user!.id === (interaction.member ?? interaction).user!.id,
                 max: 1,
                 timeout: 60_000
             })
-                .on("collect", int => app.api.interactions.reply(int.id, int.token, { content: `\`\`\`\n${err.stack.slice(0, 1950)}\`\`\`` }))
+                .on("collect", int => app.api.interactions.reply(int.id, int.token, { content: `\`\`\`\n${err.stack.slice(0, 1950)}\`\`\``, flags: app.ephemeral }))
                 .on("end", () => app.api.interactions.editReply(app.config.clientId, interaction.token, { components: [] }));
 
             return;

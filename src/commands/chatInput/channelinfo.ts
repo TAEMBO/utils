@@ -7,7 +7,8 @@ export default new ChatInputCommand({
         const channel = options.getChannel("channel", true);
 
         await app.api.interactions.reply(interaction.id, interaction.token, {
-            content: `\`\`\`js\n${formatWithOptions({ depth: 5 }, "%O", channel).slice(0, 1990)}\`\`\``
+            content: `\`\`\`js\n${formatWithOptions({ depth: 5 }, "%O", channel).slice(0, 1990)}\`\`\``,
+            flags: app.ephemeral
         });
     },
     data: new SlashCommandBuilder()

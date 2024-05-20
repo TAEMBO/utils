@@ -196,39 +196,45 @@ export default new ChatInputCommand({
             if (chosenQuantity) {
                 const units = quantities[chosenQuantity];
 
-                return await app.api.interactions.reply(interaction.id, interaction.token, { embeds: [new EmbedBuilder()
-                    .setTitle(`Convert help: ${chosenQuantity}`)
-                    .setDescription(`This quantity comprises ${units.length} units, which are:\n\n${units.sort((a, b) => a.name.localeCompare(b.name)).map(unit => `**${formatString(unit.name)}** (${unit.short.map(x => `\`${x}\``).join(", ")})`).join("\n")}`)
-                    .setColor(4203516).toJSON()]
+                return await app.api.interactions.reply(interaction.id, interaction.token, {
+                    embeds: [new EmbedBuilder()
+                        .setTitle(`Convert help: ${chosenQuantity}`)
+                        .setDescription(`This quantity comprises ${units.length} units, which are:\n\n${units.sort((a, b) => a.name.localeCompare(b.name)).map(unit => `**${formatString(unit.name)}** (${unit.short.map(x => `\`${x}\``).join(", ")})`).join("\n")}`)
+                        .setColor(4203516).toJSON()
+                    ],
+                    flags: app.ephemeral
                 });
             }
 
-            return await app.api.interactions.reply(interaction.id, interaction.token, { embeds: [new EmbedBuilder()
-                .setTitle("Convert help")
-                .setColor(4203516)
-                .setDescription("To convert something, you add **amount** and **unit** combinations to your starter(s). The syntax for an amount and unit combination is `[amount][unit symbol]`. Amount and unit combinations are called **arguments**. Arguments are divided into **starters** and a **target unit**. Starters are the starting values that you want to convert to the target unit. A conversion command can consist of one or more starters, separated with a comma (`,`) in case there are many. After starters comes the target unit as the second option. The target must not include an amount. It is just a **unit symbol**. Because you cannot convert fruits into lengths, all starters and the target unit must be of the same **quantity**, e.g. `1meter` to `centimeter`.")
-                .addFields(
-                    {
-                        name: "Supported Quantities",
-                        value: `${quantityKeys.map(formatString).join(", ")}\n\nTo learn more about a quantity and its units and unit symbols,\nuse \`/convert help\` with a specified quantity option.`
-                    },
-                    {
-                        name: "Examples",
-                        value: [
-                            "An amount: \"5\", \"1200300\", \"1.99\"",
-                            "A unit: metre, kelvin, Euro",
-                            "A unit symbol: \"fh\", \"cm^3\", \"$\", \"fl oz\"",
-                            "An argument: \"180cm\", \"12.99€\", \"5km\", \"16fl oz\"",
-                            "A target unit: \"km\", \"c\", \"m2\"",
-                            "Complete conversion examples:",
-                            "`/convert convert` `5ft, 8in` & `cm`",
-                            "`/convert convert` `300kelvin` & `celsius`",
-                            "`/convert convert` `57mm, 3.3cm, 0.4m` & `cm`"
-                        ].join("\n")
-                    }
-                )
-                .toJSON()
-            ] });
+            return await app.api.interactions.reply(interaction.id, interaction.token, {
+                embeds: [new EmbedBuilder()
+                    .setTitle("Convert help")
+                    .setColor(4203516)
+                    .setDescription("To convert something, you add **amount** and **unit** combinations to your starter(s). The syntax for an amount and unit combination is `[amount][unit symbol]`. Amount and unit combinations are called **arguments**. Arguments are divided into **starters** and a **target unit**. Starters are the starting values that you want to convert to the target unit. A conversion command can consist of one or more starters, separated with a comma (`,`) in case there are many. After starters comes the target unit as the second option. The target must not include an amount. It is just a **unit symbol**. Because you cannot convert fruits into lengths, all starters and the target unit must be of the same **quantity**, e.g. `1meter` to `centimeter`.")
+                    .addFields(
+                        {
+                            name: "Supported Quantities",
+                            value: `${quantityKeys.map(formatString).join(", ")}\n\nTo learn more about a quantity and its units and unit symbols,\nuse \`/convert help\` with a specified quantity option.`
+                        },
+                        {
+                            name: "Examples",
+                            value: [
+                                "An amount: \"5\", \"1200300\", \"1.99\"",
+                                "A unit: metre, kelvin, Euro",
+                                "A unit symbol: \"fh\", \"cm^3\", \"$\", \"fl oz\"",
+                                "An argument: \"180cm\", \"12.99€\", \"5km\", \"16fl oz\"",
+                                "A target unit: \"km\", \"c\", \"m2\"",
+                                "Complete conversion examples:",
+                                "`/convert convert` `5ft, 8in` & `cm`",
+                                "`/convert convert` `300kelvin` & `celsius`",
+                                "`/convert convert` `57mm, 3.3cm, 0.4m` & `cm`"
+                            ].join("\n")
+                        }
+                    )
+                    .toJSON()
+                ],
+                flags: app.ephemeral
+            });
         }
 
         const starters = options.getString("starter", true).split(",").map(starter => {
@@ -246,7 +252,10 @@ export default new ChatInputCommand({
             return { ...unit, amount: parseFloat(starter) };
         });
 
-        if (!areValidStarters(starters)) return await app.api.interactions.reply(interaction.id, interaction.token, { content: "You must convert *something;* Your message has 0 starters." });
+        if (!areValidStarters(starters)) return await app.api.interactions.reply(interaction.id, interaction.token, {
+            content: "You must convert *something;* Your message has 0 starters.",
+            flags: app.ephemeral
+        });
 
         const targetPortion = options.getString("target", true);
         
@@ -255,7 +264,10 @@ export default new ChatInputCommand({
             : targetPortion
         );
 
-        if (!target) return await app.api.interactions.reply(interaction.id, interaction.token, { content: "You must convert *to* something; Your message doesn't have a (valid) target unit." });
+        if (!target) return await app.api.interactions.reply(interaction.id, interaction.token, {
+            content: "You must convert *to* something; Your message doesn't have a (valid) target unit.",
+            flags: app.ephemeral
+        });
 
         // Check that all starters and target are the same quantity
         const usedQuantities = new Set([target.quantity, ...starters.map(x => x.quantity)]);
@@ -266,7 +278,10 @@ export default new ChatInputCommand({
             usedQuantities.size > 1
             || numeratorQuantities.size > 1
             || denominatorQuantities.size > 1
-        ) return await app.api.interactions.reply(interaction.id, interaction.token, { content: `All starting units and the target unit must be of the same quantity; The quantities you used were \`${[...usedQuantities, ...numeratorQuantities, ...denominatorQuantities].filter(x => x)}\`` });
+        ) return await app.api.interactions.reply(interaction.id, interaction.token, {
+            content: `All starting units and the target unit must be of the same quantity; The quantities you used were \`${[...usedQuantities, ...numeratorQuantities, ...denominatorQuantities].filter(x => x)}\``,
+            flags: app.ephemeral
+        });
 
         const quantity = [...usedQuantities][0];
 
@@ -281,15 +296,18 @@ export default new ChatInputCommand({
             : absolute / target.unit.value;
 
         // Display amount and target unit symbol
-        return await app.api.interactions.reply(interaction.id, interaction.token, { embeds: [new EmbedBuilder()
-            .setTitle(`${formatString(quantity)} conversion`)
-            .setColor(4203516)
-            .addFields(
-                { name: "Starting amount", value: starters.map(x => `${x.amount.toLocaleString("en-US")} ${x.unit.short[0]}`).join(", "), inline: true },
-                { name: "Converted amount", value: amountInTarget.toLocaleString("en-US", { maximumFractionDigits: 2 }) + " " + target.unit.short[0], inline: true }
-            )
-            .toJSON()
-        ] });
+        return await app.api.interactions.reply(interaction.id, interaction.token, {
+            embeds: [new EmbedBuilder()
+                .setTitle(`${formatString(quantity)} conversion`)
+                .setColor(4203516)
+                .addFields(
+                    { name: "Starting amount", value: starters.map(x => `${x.amount.toLocaleString("en-US")} ${x.unit.short[0]}`).join(", "), inline: true },
+                    { name: "Converted amount", value: amountInTarget.toLocaleString("en-US", { maximumFractionDigits: 2 }) + " " + target.unit.short[0], inline: true }
+                )
+                .toJSON()
+            ],
+            flags: app.ephemeral
+        });
     },
     data: new SlashCommandBuilder()
         .setName("convert")

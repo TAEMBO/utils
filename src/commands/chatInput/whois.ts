@@ -51,7 +51,7 @@ export default new ChatInputCommand({
 
             if (appData) embed.addFields(...appData);
 
-            return await app.api.interactions.reply(interaction.id, interaction.token, { embeds: [embed.toJSON()] });
+            return await app.api.interactions.reply(interaction.id, interaction.token, { embeds: [embed.toJSON()], flags: app.ephemeral });
         }
 
         const embeds: EmbedBuilder[] = [];
