@@ -62,7 +62,7 @@ export default new class App extends EventEmitter {
 
             switch (interaction.type) {
                 case InteractionType.Ping:
-                    res.send({ type: InteractionResponseType.Pong });
+                    res.status(200).write(JSON.stringify({ type: InteractionResponseType.Pong }));
                     break;
                 case InteractionType.ApplicationCommand: {
                     const options = new InteractionOptionResolver(interaction);
