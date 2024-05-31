@@ -13,7 +13,8 @@ export default new ContextMenuCommand<"user">({
         };
 
         await app.api.interactions.reply(interaction.id, interaction.token, {
-            content: `\`\`\`js\n${formatWithOptions({ depth: 5 }, "%O", targetMember ?? targetUser).slice(0, 1990)}\`\`\``
+            content: `\`\`\`js\n${formatWithOptions({ depth: 5 }, "%O", targetMember ?? targetUser).slice(0, 1990)}\`\`\``,
+            flags: app.ephemeral
         });
     },
     data: new ContextMenuCommandBuilder()
