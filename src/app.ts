@@ -55,7 +55,7 @@ export default new class App extends EventEmitter {
             }
         }
 
-        this.server.use(parser, verifyKey).post(`/${this.config.publicKey}`, async (req, res) => {
+        this.server.use(parser, verifyKey).post("/", async (req, res) => {
             const interaction: APIInteraction = req.body;
 
             this.emit("interaction", interaction);
