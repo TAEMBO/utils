@@ -63,7 +63,7 @@ export default new class App extends EventEmitter {
             switch (interaction.type) {
                 case InteractionType.Ping:
                     res
-                        .setHeader('Content-Type', 'application/json')
+                        .setHeader("Content-Type", "application/json")
                         .writeHead(200)
                         .end(JSON.stringify({ type: InteractionResponseType.Pong }));
                     break;
