@@ -62,7 +62,10 @@ export default new class App extends EventEmitter {
 
             switch (interaction.type) {
                 case InteractionType.Ping:
-                    res.status(200).write(JSON.stringify({ type: InteractionResponseType.Pong }));
+                    res
+                        .setHeader('Content-Type', 'application/json')
+                        .writeHead(200)
+                        .end(JSON.stringify({ type: InteractionResponseType.Pong }));
                     break;
                 case InteractionType.ApplicationCommand: {
                     const options = new InteractionOptionResolver(interaction);
@@ -110,6 +113,6 @@ export default new class App extends EventEmitter {
                     log("Yellow", "ModalSubmit not implemented");
                     break;
             }
-        }).listen(config.port, config.hostname, () => log("Blue", `Live on \x1b[33m${config.port}\x1b[34m at \x1b[33m/${this.config.publicKey}`));
+        }).listen(config.port, config.hostname, () => log("Blue", `Live on port \x1b[33m${config.port}\x1b[34m`));
     }
 }();
