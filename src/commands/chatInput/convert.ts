@@ -201,7 +201,7 @@ export default new ChatInputCommand({
                     embeds: [new EmbedBuilder()
                         .setTitle(`Convert help: ${chosenQuantity}`)
                         .setDescription(`This quantity comprises ${units.length} units, which are:\n\n${units.sort((a, b) => a.name.localeCompare(b.name)).map(unit => `**${formatString(unit.name)}** (${unit.short.map(x => `\`${x}\``).join(", ")})`).join("\n")}`)
-                        .setColor(4203516).toJSON()
+                        .setColor(app.config.embedColor).toJSON()
                     ],
                     flags: app.ephemeral
                 });
@@ -210,7 +210,7 @@ export default new ChatInputCommand({
             return await app.api.interactions.reply(interaction.id, interaction.token, {
                 embeds: [new EmbedBuilder()
                     .setTitle("Convert help")
-                    .setColor(4203516)
+                    .setColor(app.config.embedColor)
                     .setDescription("To convert something, you add **amount** and **unit** combinations to your starter(s). The syntax for an amount and unit combination is `[amount][unit symbol]`. Amount and unit combinations are called **arguments**. Arguments are divided into **starters** and a **target unit**. Starters are the starting values that you want to convert to the target unit. A conversion command can consist of one or more starters, separated with a comma (`,`) in case there are many. After starters comes the target unit as the second option. The target must not include an amount. It is just a **unit symbol**. Because you cannot convert fruits into lengths, all starters and the target unit must be of the same **quantity**, e.g. `1meter` to `centimeter`.")
                     .addFields(
                         {
@@ -300,7 +300,7 @@ export default new ChatInputCommand({
         return await app.api.interactions.reply(interaction.id, interaction.token, {
             embeds: [new EmbedBuilder()
                 .setTitle(`${formatString(quantity)} conversion`)
-                .setColor(4203516)
+                .setColor(app.config.embedColor)
                 .addFields(
                     { name: "Starting amount", value: starters.map(x => `${x.amount.toLocaleString("en-US")} ${x.unit.short[0]}`).join(", "), inline: true },
                     { name: "Converted amount", value: amountInTarget.toLocaleString("en-US", { maximumFractionDigits: 2 }) + " " + target.unit.short[0], inline: true }

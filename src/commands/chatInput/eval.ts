@@ -16,7 +16,7 @@ export default new ChatInputCommand({
         const useAsync = Boolean(options.getBoolean("async", false));
         const embed = new Builders.EmbedBuilder()
             .setTitle("__Eval__")
-            .setColor(4203516)
+            .setColor(app.config.embedColor)
             .addFields({ name: "Input", value: `\`\`\`js\n${code.slice(0, 1010)}\`\`\`` });
         const now = performance.now();
         let output;

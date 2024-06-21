@@ -46,7 +46,7 @@ export default new ChatInputCommand({
                     { name: `🔹 ${user.bot ? "Bot" : "Account"} created`, value: `<t:${Math.round(timeFromSnowflake(user.id) / 1_000)}:R>` },
                     { name: "🔹 Flags", value: getUserFlags(user.flags ?? 0).join(", ") || "None" }
                 )
-                .setColor(parseInt("4023fc", 16))
+                .setColor(app.config.embedColor)
                 .setImage(user.banner ? app.api.rest.cdn.banner(user.id, user.banner, { extension: "png", size: 1024 }) : null);
 
             if (appData) embed.addFields(...appData);
@@ -76,7 +76,7 @@ export default new ChatInputCommand({
                 },
                 { name: "🔹 Flags", value: getUserFlags(user.flags ?? 0).join(", ") || "None", inline: true }
             )
-            .setColor(parseInt("4023fc", 16))
+            .setColor(app.config.embedColor)
             .setImage(user.banner ? app.api.rest.cdn.banner(user.id, user.banner, { extension: "png", size: 1024 }) : null);
 
         if (member.premium_since) embed.addFields([{
