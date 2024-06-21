@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
+import { SlashCommandBuilder, time } from "@discordjs/builders";
 import { ChatInputCommand } from "../../structures/index.js";
 import { timeFromSnowflake } from "../../utilities.js";
 
@@ -11,10 +11,13 @@ export default new ChatInputCommand({
             flags: app.ephemeral
         });
 
-        const unixTime = Math.round(timeFromSnowflake(snowflake) / 1_000);
+        const unixTime = new Date(timeFromSnowflake(snowflake));
 
         await app.api.interactions.reply(interaction.id, interaction.token, {
-            content: `Snowflake: \`${snowflake}\`\nTime: <t:${unixTime}> - <t:${unixTime}:R>\nUnix: \`${unixTime}\``,
+            content:
+                `Snowflake: \`${snowflake}\`\n`
+                + `Time: ${time(unixTime)} - ${time(unixTime, "R")}\n`
+                + `Unix: \`${unixTime.getTime()}\``,
             flags: app.ephemeral
         });
     },
