@@ -14,7 +14,7 @@ export default new ChatInputCommand({
 
         await app.api.interactions.reply(interaction.id, interaction.token, {
             content: `Ephemeral set to \`${ephemeral}\``,
-            flags: app.ephemeral
+            flags: MessageFlags.Ephemeral
         });
     },
     data: new SlashCommandBuilder()

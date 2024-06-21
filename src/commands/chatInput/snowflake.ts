@@ -14,7 +14,8 @@ export default new ChatInputCommand({
         const unixTime = Math.round(timeFromSnowflake(snowflake) / 1_000);
 
         await app.api.interactions.reply(interaction.id, interaction.token, {
-            content: `Snowflake: \`${snowflake}\`\nTime: <t:${unixTime}> - <t:${unixTime}:R>` 
+            content: `Snowflake: \`${snowflake}\`\nTime: <t:${unixTime}> - <t:${unixTime}:R>\nUnix: \`${unixTime}\``,
+            flags: app.ephemeral
         });
     },
     data: new SlashCommandBuilder()
