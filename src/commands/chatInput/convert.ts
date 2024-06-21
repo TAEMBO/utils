@@ -83,6 +83,7 @@ const quantities: Record<string, CombinedQuantity[]> = {
     volume: [
         { name: "metre cubed", value: 1, short: ["m^3", "m3", "meter cubed"] },
         { name: "centimetre cubed", value: 0.000001, short: ["cm^3", "cm3", "centimeter cubed"] },
+        { name: "inch cubed", value: 0.000016387, short: ["in^3", "in3", "cubic inch"] },
         { name: "US fluid ounce", value: 0.0000295735296, short: ["fl oz", "floz"] },
         { name: "litre", value: 0.001, short: ["l", "liter"] },
         { name: "desilitre", value: 0.0001, short: ["dl", "desiliter"] },
