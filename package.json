@@ -10,6 +10,11 @@
     "lint": "eslint ./src",
     "build": "npm run lint && tsc"
   },
+  "imports": {
+    "#config": "./dist/config.json",
+    "#util": "./dist/util/index.js",
+    "#structures": "./dist/structures/index.js"
+  },
   "dependencies": {
     "@discordjs/builders": "^1.8.1",
     "@discordjs/collection": "^2.1.0",

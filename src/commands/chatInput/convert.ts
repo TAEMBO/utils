@@ -1,6 +1,6 @@
 import { EmbedBuilder, SlashCommandBuilder } from "@discordjs/builders";
-import { ChatInputCommand } from "../../structures/index.js";
-import { formatString } from "../../utilities.js";
+import { ChatInputCommand } from "#structures";
+import { formatString } from "#util";
 
 interface Quantity {
     readonly name: string;

@@ -2,7 +2,7 @@
 import { type APIInteraction, type APIMessageComponentInteraction, InteractionType } from "@discordjs/core/http-only";
 import { EventEmitter } from "node:events";
 import type App from "../app.js";
-import { CollectorOptions } from "../typings.js";
+import { CollectorOptions } from "#typings";
 
 declare interface Collector {
     on(event: "collect", listener: (args: APIMessageComponentInteraction) => any): this;

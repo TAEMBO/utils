@@ -2,9 +2,9 @@ import { type RESTPostAPIChatInputApplicationCommandsJSONBody, Routes } from "@d
 import { REST } from "@discordjs/rest";
 import { readdir } from "node:fs/promises";
 import { resolve } from "node:path";
-import config from "./config.json" assert { type: "json" };
-import { ChatInputCommand, ContextMenuCommand } from "./structures/index.js";
-import { log } from "./utilities.js";
+import config from "#config" assert { type: "json" };
+import { ChatInputCommand, ContextMenuCommand } from "#structures";
+import { log } from "#util";
 
 const commands: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
 const rest = new REST().setToken(config.token);

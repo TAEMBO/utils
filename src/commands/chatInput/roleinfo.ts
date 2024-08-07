@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { formatWithOptions } from "node:util";
-import { ChatInputCommand } from "../../structures/index.js";
+import { ChatInputCommand } from "#structures";
 
 export default new ChatInputCommand({
     async run(app, interaction, options) {

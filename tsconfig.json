@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "target": "ES2021",
-        "baseUrl": ".",
+        "baseUrl": "./",
         "module": "ESNext",
         "forceConsistentCasingInFileNames": true,
         "strict": true,
@@ -19,6 +19,12 @@
         "noImplicitThis": true,
         "removeComments": true,
         "outDir": "dist",
+        "paths": {
+            "#config": ["src/config.json"],
+            "#util": ["src/util/index.js"],
+            "#structures": ["src/structures/index.js"],
+            "#typings": ["src/typings.d.ts"]
+        }
     },
     "include": ["src"]
 }

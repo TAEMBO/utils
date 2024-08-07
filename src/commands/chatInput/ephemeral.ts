@@ -1,6 +1,6 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
-import { ChatInputCommand } from "../../structures/index.js";
 import { MessageFlags } from "@discordjs/core/http-only";
+import { SlashCommandBuilder } from "@discordjs/builders";
+import { ChatInputCommand } from "#structures";
 
 export default new ChatInputCommand({
     async run(app, interaction, options) {

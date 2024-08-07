@@ -1,10 +1,9 @@
 import * as Discord from "@discordjs/core/http-only";
 import * as Builders from "@discordjs/builders";
-import { performance } from "node:perf_hooks";
 import { setTimeout as sleep } from "node:timers/promises";
 import { formatWithOptions } from "node:util";
-import { ChatInputCommand } from "../../structures/index.js";
-import * as utils from "../../utilities.js";
+import { ChatInputCommand } from "#structures";
+import * as utils from "#util";
 
 export default new ChatInputCommand({
     async run(app, interaction, options) {

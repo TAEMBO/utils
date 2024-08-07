@@ -1,8 +1,8 @@
 import { EmbedBuilder, SlashCommandBuilder } from "@discordjs/builders";
 import type { APIEmbedField } from "@discordjs/core/http-only";
-import { ChatInputCommand } from "../../structures/index.js";
-import { formatUser, getApplicationFlags, getUserFlags, timeFromSnowflake } from "../../utilities.js";
-import type { ApplicationRPC } from "../../typings.js";
+import { ChatInputCommand } from "#structures";
+import { formatUser, getApplicationFlags, getUserFlags, timeFromSnowflake } from "#util";
+import type { ApplicationRPC } from "#typings";
 
 export default new ChatInputCommand({
     async run(app, interaction, options) {

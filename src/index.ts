@@ -11,8 +11,8 @@ import { readdir } from "node:fs/promises";
 import { resolve } from "node:path";
 import { InteractionOptionResolver } from "@sapphire/discord-utilities";
 import App from "./app.js";
-import { ChatInputCommand, ContextMenuCommand } from "./structures/index.js";
-import { log, parser, verifyKey } from "./utilities.js";
+import { ChatInputCommand, ContextMenuCommand } from "#structures";
+import { log, parser, verifyKey } from "#util";
 
 const app = new App();
 

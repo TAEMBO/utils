@@ -2,7 +2,8 @@ import type { Next } from "polka";
 import type { Request, Response } from "express";
 import { TextEncoder } from "node:util";
 import { webcrypto } from "node:crypto";
-import config from "../config.json" assert { type: "json" };
+import config from "#config" assert { type: "json" };
+
 const { subtle } = webcrypto;
 const encoder = new TextEncoder();
 

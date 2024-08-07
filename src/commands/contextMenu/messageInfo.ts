@@ -1,7 +1,7 @@
 import { ApplicationCommandType } from "@discordjs/core/http-only";
 import { ContextMenuCommandBuilder } from "@discordjs/builders";
 import { formatWithOptions } from "node:util";
-import { ContextMenuCommand } from "../../structures/index.js";
+import { ContextMenuCommand } from "#structures";
 
 export default new ContextMenuCommand<"message">({
     async run(app, interaction, options) {
