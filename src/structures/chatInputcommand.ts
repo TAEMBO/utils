@@ -8,14 +8,11 @@ import type { CombinedSlashCommandBuilder } from "../typings.js";
  */
 export class ChatInputCommand {
     /** The function that is ran for this command */
-    public run: (app: typeof App, interaction: APIChatInputApplicationCommandInteraction, options: InteractionOptionResolver) => Promise<any>;
+    public run: (app: App, interaction: APIChatInputApplicationCommandInteraction, options: InteractionOptionResolver) => Promise<any>;
     /** The builder data for this command */
     public readonly data: CombinedSlashCommandBuilder;
 
-    public constructor(commandData: {
-        readonly data: CombinedSlashCommandBuilder;
-        run(app: typeof App, interaction: APIChatInputApplicationCommandInteraction, options: InteractionOptionResolver): Promise<any>;
-    }) {
+    public constructor(commandData: ChatInputCommand) {
         this.run = commandData.run;
         this.data = commandData.data;
     }

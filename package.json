@@ -4,7 +4,7 @@
   "description": "HTTP-based interactions-only user-installed Discord utility bot",
   "private": true,
   "type": "module",
-  "main": "./dist/app.js",
+  "main": "./dist/index.js",
   "author": "TAEMBO",
   "scripts": {
     "lint": "eslint ./src",

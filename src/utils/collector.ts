@@ -14,7 +14,7 @@ class Collector extends EventEmitter {
     private timer: NodeJS.Timeout | undefined;
     private filter: (int: APIMessageComponentInteraction) => boolean;
 
-    public constructor(private app: typeof App, private options: CollectorOptions = {}) {
+    public constructor(private app: App, private options: CollectorOptions = {}) {
         super();
         this.filter = options.filter ?? (() => true);
         this.timer = options.timeout ? setTimeout(() => this.end("timeout"), options.timeout) : undefined;
