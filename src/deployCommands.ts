@@ -1,17 +1,18 @@
-import { type RESTPostAPIChatInputApplicationCommandsJSONBody, Routes } from "@discordjs/core/http-only";
+import { type RESTPostAPIApplicationCommandsJSONBody, Routes } from "@discordjs/core/http-only";
 import { REST } from "@discordjs/rest";
 import { readdir } from "node:fs/promises";
-import { resolve } from "node:path";
+import { join } from "node:path";
 import config from "#config" assert { type: "json" };
 import { ChatInputCommand, ContextMenuCommand } from "#structures";
 import { log } from "#util";
 
-const commands: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
+const commands: RESTPostAPIApplicationCommandsJSONBody[] = [];
 const rest = new REST().setToken(config.token);
 
-for (const folder of await readdir(resolve("./commands"))) {
-    for (const file of await readdir(resolve("./commands", folder))) {
-        const commandFile = await import(`./commands/${folder}/${file}`);
+for (const folder of await readdir("commands")) {
+    for (const file of await readdir(join("commands", folder))) {
+        const commandPath = new URL(join("commands", folder, file), import.meta.url);
+        const commandFile = await import(commandPath.toString());
 
         if (
             !(commandFile.default instanceof ChatInputCommand)
