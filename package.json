@@ -1,7 +1,7 @@
 {
-  "name": "interactions-only",
+  "name": "utils",
   "version": "0.0.0",
-  "description": "HTTP-based interactions-only user-installed Discord utility bot",
+  "description": "Personal HTTP-interactions user-installed Discord utility app",
   "private": true,
   "type": "module",
   "main": "./dist/index.js",
