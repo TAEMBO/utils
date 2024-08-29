@@ -8,7 +8,7 @@ import {
 } from "@discordjs/core/http-only";
 import { ContextMenuCommandBuilder } from "@discordjs/builders";
 import { readdir } from "node:fs/promises";
-import { resolve } from "node:path";
+import { join } from "node:path";
 import { InteractionOptionResolver } from "@sapphire/discord-utilities";
 import App from "./app.js";
 import { ChatInputCommand, ContextMenuCommand } from "#structures";
@@ -16,9 +16,10 @@ import { log, parser, verifyKey } from "#util";
 
 const app = new App();
 
-for (const folder of await readdir(resolve("./commands"))) {
-    for (const file of await readdir(resolve("./commands", folder))) {
-        const commandFile = await import(`./commands/${folder}/${file}`);
+for (const folder of await readdir("commands")) {
+    for (const file of await readdir(join("commands", folder))) {
+        const commandPath = new URL(join("commands", folder, file), import.meta.url);
+        const commandFile = await import(commandPath.toString());
 
         if (
             !(commandFile.default instanceof ChatInputCommand)
@@ -29,7 +30,9 @@ for (const folder of await readdir(resolve("./commands"))) {
             continue;
         }
 
-        const collectionType = commandFile.default.data instanceof ContextMenuCommandBuilder ? "contextMenuCommands": "chatInputCommands";
+        const collectionType = commandFile.default.data instanceof ContextMenuCommandBuilder
+            ? "contextMenuCommands"
+            : "chatInputCommands";
 
         app[collectionType].set(commandFile.default.data.name, commandFile.default);
     }
