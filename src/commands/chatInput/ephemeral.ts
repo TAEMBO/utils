@@ -1,5 +1,4 @@
-import { MessageFlags } from "@discordjs/core/http-only";
-import { SlashCommandBuilder } from "@discordjs/builders";
+import { ApplicationCommandOptionType, MessageFlags } from "@discordjs/core/http-only";
 import { ChatInputCommand } from "#structures";
 
 export default new ChatInputCommand({
@@ -17,11 +16,16 @@ export default new ChatInputCommand({
             flags: MessageFlags.Ephemeral
         });
     },
-    data: new SlashCommandBuilder()
-        .setName("ephemeral")
-        .setDescription("Set whether all replies and follow-ups are ephemeral or not")
-        .addBooleanOption(x => x
-            .setName("ephemeral")
-            .setDescription("Whether to use ephemeral or not")
-            .setRequired(true))
+    data: {
+        name: "ephemeral",
+        description: "Set whether all replies and follow-ups are ephemeral or not",
+        options: [
+            {
+                type: ApplicationCommandOptionType.Boolean,
+                name: "ephemeral",
+                description: "Whether to use ephemeral or not",
+                required: true
+            }
+        ]
+    }
 });

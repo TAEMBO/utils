@@ -1,4 +1,3 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
 import { ChatInputCommand } from "#structures";
 import { timeFromSnowflake } from "#util";
 
@@ -12,7 +11,8 @@ export default new ChatInputCommand({
             content: `Round-trip: \`${timeFromSnowflake(msg.id) - timeFromSnowflake(interaction.id)}\`ms`
         });
     },
-    data: new SlashCommandBuilder()
-        .setName("ping")
-        .setDescription("Check bot's ping")
+    data: {
+        name: "ping",
+        description: "Check this application's ping"
+    }
 });

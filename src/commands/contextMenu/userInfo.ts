@@ -1,5 +1,4 @@
 import { ApplicationCommandType } from "@discordjs/core/http-only";
-import { ContextMenuCommandBuilder } from "@discordjs/builders";
 import { formatWithOptions } from "node:util";
 import { ContextMenuCommand } from "#structures";
 
@@ -17,7 +16,8 @@ export default new ContextMenuCommand<"user">({
             flags: app.ephemeral
         });
     },
-    data: new ContextMenuCommandBuilder()
-        .setName("User Info")
-        .setType(ApplicationCommandType.User)
+    data: {
+        type: ApplicationCommandType.User,
+        name: "User Info"
+    }
 });

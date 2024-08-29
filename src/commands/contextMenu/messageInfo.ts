@@ -1,5 +1,4 @@
 import { ApplicationCommandType } from "@discordjs/core/http-only";
-import { ContextMenuCommandBuilder } from "@discordjs/builders";
 import { formatWithOptions } from "node:util";
 import { ContextMenuCommand } from "#structures";
 
@@ -12,7 +11,8 @@ export default new ContextMenuCommand<"message">({
             flags: app.ephemeral
         });
     },
-    data: new ContextMenuCommandBuilder()
-        .setName("Message Info")
-        .setType(ApplicationCommandType.Message)
+    data: {
+        type: ApplicationCommandType.Message,
+        name: "Message Info",
+    }
 });

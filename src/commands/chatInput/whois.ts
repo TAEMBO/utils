@@ -1,5 +1,5 @@
-import { EmbedBuilder, SlashCommandBuilder } from "@discordjs/builders";
-import type { APIEmbedField } from "@discordjs/core/http-only";
+import { EmbedBuilder } from "@discordjs/builders";
+import { ApplicationCommandOptionType, type APIEmbedField } from "@discordjs/core/http-only";
 import { ChatInputCommand } from "#structures";
 import { formatUser, getApplicationFlags, getUserFlags, timeFromSnowflake } from "#util";
 import type { ApplicationRPC } from "#typings";
@@ -101,11 +101,16 @@ export default new ChatInputCommand({
             flags: app.ephemeral
         });
     },
-    data: new SlashCommandBuilder()
-        .setName("whois")
-        .setDescription("Get info on a user")
-        .addUserOption(x => x
-            .setName("user")
-            .setDescription("The user to get info on")
-            .setRequired(true))
+    data: {
+        name: "whois",
+        description: "Get info on a user",
+        options: [
+            {
+                type: ApplicationCommandOptionType.User,
+                name: "user",
+                description: "The user to get info on",
+                required: true
+            }
+        ]
+    }
 });

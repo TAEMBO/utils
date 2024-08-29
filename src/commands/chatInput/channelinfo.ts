@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
+import { ApplicationCommandOptionType } from "@discordjs/core";
 import { formatWithOptions } from "node:util";
 import { ChatInputCommand } from "#structures";
 
@@ -11,11 +11,16 @@ export default new ChatInputCommand({
             flags: app.ephemeral
         });
     },
-    data: new SlashCommandBuilder()
-        .setName("channelinfo")
-        .setDescription("Get API data on a channel")
-        .addChannelOption(x => x
-            .setName("channel")
-            .setDescription("The channel to get API data on")
-            .setRequired(true))
+    data: {
+        name: "channelinfo",
+        description: "Get API data on a channel",
+        options: [
+            {
+                type: ApplicationCommandOptionType.Channel,
+                name: "channel",
+                description: "The channel to get API data on",
+                required: true
+            }
+        ]
+    }
 });

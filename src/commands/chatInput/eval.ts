@@ -65,18 +65,29 @@ export default new ChatInputCommand({
 
         await app.api.interactions.editReply(app.config.clientId, interaction.token, { embeds: [embed.toJSON()] });
     },
-    data: new Builders.SlashCommandBuilder()
-        .setName("eval")
-        .setDescription("Execute code within the application")
-        .addStringOption(x => x
-            .setName("code")
-            .setDescription("The code to execute")
-            .setRequired(true))
-        .addIntegerOption(x => x
-            .setName("depth")
-            .setDescription("The depth of the output")
-            .setMaxValue(5))
-        .addBooleanOption(x => x
-            .setName("async")
-            .setDescription("Whether to wrap the code in an async block or not"))
+    data: {
+        name: "eval",
+        description: "Execute code within the application",
+        options: [
+            {
+                type: Discord.ApplicationCommandOptionType.String,
+                name: "code",
+                description: "The code to execute",
+                required: true
+            },
+            {
+                type: Discord.ApplicationCommandOptionType.Integer,
+                name: "depth",
+                description: "The depth of the output",
+                max_value: 5,
+                required: false
+            },
+            {
+                type: Discord.ApplicationCommandOptionType.Boolean,
+                name: "async",
+                description: "Whether to wrap the code in an async block or not",
+                required: false
+            }
+        ]
+    }
 });

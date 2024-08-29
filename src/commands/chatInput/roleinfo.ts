@@ -1,6 +1,6 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
 import { formatWithOptions } from "node:util";
 import { ChatInputCommand } from "#structures";
+import { ApplicationCommandOptionType } from "@discordjs/core";
 
 export default new ChatInputCommand({
     async run(app, interaction, options) {
@@ -11,11 +11,16 @@ export default new ChatInputCommand({
             flags: app.ephemeral
         });
     },
-    data: new SlashCommandBuilder()
-        .setName("roleinfo")
-        .setDescription("Get API data on a role")
-        .addRoleOption(x => x
-            .setName("role")
-            .setDescription("The role to get API data on")
-            .setRequired(true))
+    data: {
+        name: "roleinfo",
+        description: "Get API data on a role",
+        options: [
+            {
+                type: ApplicationCommandOptionType.Role,
+                name: "role",
+                description: "The role to get API data on",
+                required: true
+            }
+        ]
+    }
 });

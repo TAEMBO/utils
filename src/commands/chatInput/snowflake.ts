@@ -1,6 +1,7 @@
-import { SlashCommandBuilder, time } from "@discordjs/builders";
+import { time } from "@discordjs/builders";
 import { ChatInputCommand } from "#structures";
 import { timeFromSnowflake } from "#util";
+import { ApplicationCommandOptionType } from "@discordjs/core";
 
 export default new ChatInputCommand({
     async run(app, interaction, options) {
@@ -21,13 +22,18 @@ export default new ChatInputCommand({
             flags: app.ephemeral
         });
     },
-    data: new SlashCommandBuilder()
-        .setName("snowflake")
-        .setDescription("Get timestamp info from a given snowflake")
-        .addStringOption(x => x
-            .setName("snowflake")
-            .setDescription("The snowflake to get timestamp info on")
-            .setRequired(true)
-            .setMinLength(16)
-            .setMaxLength(20))
+    data: {
+        name: "snowflake",
+        description: "Get timestmap info from a given snowflake",
+        options: [
+            {
+                type: ApplicationCommandOptionType.String,
+                name: "snowflake",
+                description: "The snowflake to get timestmap info on",
+                min_length: 16,
+                max_length: 20,
+                required: true
+            }
+        ]
+    }
 });

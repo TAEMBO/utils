@@ -1,4 +1,5 @@
-import { EmbedBuilder, SlashCommandBuilder } from "@discordjs/builders";
+import { ApplicationCommandOptionType } from "@discordjs/core";
+import { EmbedBuilder } from "@discordjs/builders";
 import { ChatInputCommand } from "#structures";
 import { formatString } from "#util";
 
@@ -310,26 +311,43 @@ export default new ChatInputCommand({
             flags: app.ephemeral
         });
     },
-    data: new SlashCommandBuilder()
-        .setName("convert")
-        .setDescription("Quantity conversion")
-        .addSubcommand(x => x
-            .setName("help")
-            .setDescription("Show how to use the command")
-            .addStringOption(x => x
-                .setName("quantity")
-                .setDescription("The quantity to get info on")
-                .setChoices(...quantityKeys.map(x => ({ name: formatString(x), value: x })))
-                .setRequired(false)))
-        .addSubcommand(x => x
-            .setName("convert")
-            .setDescription("Convert one quantity to another")
-            .addStringOption(x => x
-                .setName("starter")
-                .setDescription("The starting quantity(s)")
-                .setRequired(true))
-            .addStringOption(x => x
-                .setName("target")
-                .setDescription("The target quantity")
-                .setRequired(true)))
+    data: {
+        name: "convert",
+        description: "Quantity conversion",
+        options: [
+            {
+                type: ApplicationCommandOptionType.Subcommand,
+                name: "help",
+                description: "Show how to use the command",
+                options: [
+                    {
+                        type: ApplicationCommandOptionType.String,
+                        name: "quantity",
+                        description: "The quantity to get info on",
+                        choices: quantityKeys.map(x => ({ name: formatString(x), value: x })),
+                        required: false
+                    }
+                ]
+            },
+            {
+                type: ApplicationCommandOptionType.Subcommand,
+                name: "convert",
+                description: "Convert one quantity to another",
+                options: [
+                    {
+                        type: ApplicationCommandOptionType.String,
+                        name: "starter",
+                        description: "The starting quantity to convert from",
+                        required: true
+                    },
+                    {
+                        type: ApplicationCommandOptionType.String,
+                        name: "target",
+                        description: "The target quantity to covert to",
+                        required: true
+                    }
+                ]
+            }
+        ]
+    }
 });
