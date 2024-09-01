@@ -3,28 +3,26 @@ import { EmbedBuilder } from "@discordjs/builders";
 import { ChatInputCommand } from "#structures";
 import { formatString } from "#util";
 
-interface Quantity {
+interface BaseQuantity {
     readonly name: string;
     readonly short: string[];
     readonly value: number;
-    readonly numeratorQuantity?: string;
-    readonly denominatorQuantity?: string;
 }
 
-interface StandardQuantity extends Quantity { 
+interface StandardQuantity extends BaseQuantity { 
     readonly tempMath?: undefined;
 }
 
-interface TemperatureQuantity extends Quantity {
+interface TemperatureQuantity extends BaseQuantity {
     readonly tempMath: {
         readonly toSelf: (absolute: number) => number;
         readonly toBase: (amount: number) => number;
     };
 }
 
-type CombinedQuantity = StandardQuantity | TemperatureQuantity;
+type Quantity = StandardQuantity | TemperatureQuantity;
 
-const quantities: Record<string, CombinedQuantity[]> = {
+const quantities: Record<string, Quantity[]> = {
     storage: [
         { name: "bit", value: 1, short: ["bit", "bits"] },
         { name: "kilobit", value: 1_000, short: ["Kbit", "kilobits"] },
@@ -41,40 +39,16 @@ const quantities: Record<string, CombinedQuantity[]> = {
     space: [
         { name: "metre", value: 1, short: ["m", "meter"] },
         { name: "centimetre", value: 0.01, short: ["cm", "centimeter"] },
-        { name: "millimetre", value: 0.001, short: ["mm", "millimeter"]},
+        { name: "millimetre", value: 0.001, short: ["mm", "millimeter"] },
         { name: "kilometre", value: 1_000, short: ["km", "kilometer"] },
         { name: "mile", value: 1_609.344, short: ["mi", "miles"] },
-        { name: "yard", value: .9144, short: ["yd", "yards"] },
+        { name: "yard", value: 0.9144, short: ["yd", "yards"] },
         { name: "foot", value: 0.3048, short: ["ft", "feet", "\""] },
         { name: "inch", value: 0.0254, short: ["in", "inches", "\""] },
         { name: "light-year", value: 9_460_528_400_000_000, short: ["ly", "lightyear"] },
         { name: "astronomical unit", value: 149_597_870_700, short: ["au"] }
     ],
-    currency: [
-        { name: "Euro :flag_eu:", value: 1, short: ["EUR", "€"] },
-        { name: "US Dollar :flag_us:", value: 0.92, short: ["USD", "$"], },
-        { name: "Pound Sterling :flag_gb:", value: 1.17, short: ["GBP", "£"] },
-        { name: "Turkish Lira :flag_tr:", value: 0.029, short: ["TRY", "TL", "₺"] },
-        { name: "Russian Ruble :flag_ru:", value: 0.01, short: ["RUB", "₽"] },
-        { name: "Canadian Dollar :flag_ca:", value: 0.68, short: ["CAD"] },
-        { name: "Australian Dollar :flag_au:", value: 0.6, short: ["AUD"] },
-        { name: "Japanese Yen :flag_jp:", value: 0.0061, short: ["JPY", "¥", "yen", "jy"] },
-        { name: "New Zealand Dollar :flag_nz:", value: 0.56, short: ["NZD"] },
-        { name: "Indonesian Rupiah :flag_id:", value: 0.000059, short: ["IDR", "Rp"] },
-        { name: "Chinese Yuan Renminbi :flag_cn:", value: 0.13, short: ["CN¥", "CNY", "RMB", "元"] },
-        { name: "Swedish krona :flag_se:", value: 0.089, short: ["SEK", "kr"] },
-        { name: "Norwegian krone :flag_no:", value: 0.088, short: ["NOK"] },
-        { name: "Danish krone :flag_dk:", value: 0.13, short: ["DKK"] },
-        { name: "Icelandic króna :flag_is:", value: 0.0067, short: ["ISK"] },
-        { name: "Czech koruna :flag_cz:", value: 0.039, short: ["CZK", "Kč"] },
-        { name: "Swiss franc :flag_ch:", value: 1.04, short: ["CFH", "fr"] },
-        { name: "Ukrainian hryvnia :flag_ua:", value: 0.024, short: ["UAH", "₴", "грн"] },
-        { name: "Indian rupee :flag_in:", value: 0.011, short: ["INR", "₹"] },
-        { name: "United Arab Emirates dirham :flag_ae:", value: 0.25, short: ["AED", "د.إ"] },
-        { name: "Sri Lankan Rupee :flag_lk:", value: 0.003, short: ["LKR", "රු", "ரூ"] },
-        { name: "Hungarian Forint :flag_hu:", value: 0.0025, short: ["HUF"] },
-        { name: "Among Us ඞ:red_square:", value: NaN, short: ["SUS"] },
-    ],
+    currency: await fetchCurrencies(),
     mass: [
         { name: "gram", value: 1, short: ["g"] },
         { name: "kilogram", value: 1000, short: ["kg", "kgs"] },
@@ -151,20 +125,13 @@ const quantities: Record<string, CombinedQuantity[]> = {
 const quantityKeys = Object.keys(quantities);
 const quantityValues = Object.values(quantities);
 
-function areTempQuantities(quantities: { unit?: CombinedQuantity }[]): quantities is {
-    quantity: string,
-    unit: TemperatureQuantity,
-    amount: number
-}[] {
-    return quantities.every((quantity) => quantity.unit?.tempMath);
-}
+async function fetchCurrencies() {
+    const currencyNames: Record<string, string> = await fetch("https://latest.currency-api.pages.dev/v1/currencies.json").then(x => x.json());
+    const { eur: currencyValues }: { eur: Record<string, number> } = await fetch("https://latest.currency-api.pages.dev/v1/currencies/eur.json").then(x => x.json());
 
-function areValidStarters(starters: (Record<string, any> | undefined)[]): starters is {
-    amount: number;
-    quantity: string;
-    unit: CombinedQuantity;
-}[] {
-    return starters.every(x => x);
+    return Object.entries(currencyValues)
+        .filter(x => currencyNames[x[0]])
+        .map(currency => ({ name: currencyNames[currency[0]], value: currency[1], short: [currency[0]] }));
 }
 
 function findUnit(unitNameQuery: string) {
@@ -198,10 +165,27 @@ export default new ChatInputCommand({
             if (chosenQuantity) {
                 const units = quantities[chosenQuantity];
 
+                if (chosenQuantity === "currency") return await app.api.interactions.reply(interaction.id, interaction.token, {
+                    embeds: [new EmbedBuilder()
+                        .setTitle(`Convert help: ${chosenQuantity}`)
+                        .setDescription(`
+                            This quantity comprises ${units.length} units.
+                            Please use external sources for currency lists/names due to the amount comprised here being too large to display.
+                        `)
+                        .setColor(app.config.embedColor).toJSON()
+                    ],
+                    flags: app.ephemeral
+                });
+
+                const formattedUnits = units
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map(unit => `**${formatString(unit.name)}** (${unit.short.map(x => `\`${x}\``).join(", ")})`)
+                    .join("\n");
+
                 return await app.api.interactions.reply(interaction.id, interaction.token, {
                     embeds: [new EmbedBuilder()
                         .setTitle(`Convert help: ${chosenQuantity}`)
-                        .setDescription(`This quantity comprises ${units.length} units, which are:\n\n${units.sort((a, b) => a.name.localeCompare(b.name)).map(unit => `**${formatString(unit.name)}** (${unit.short.map(x => `\`${x}\``).join(", ")})`).join("\n")}`)
+                        .setDescription(`This quantity comprises ${units.length} units, which are:\n\n${formattedUnits}`)
                         .setColor(app.config.embedColor).toJSON()
                     ],
                     flags: app.ephemeral
@@ -212,24 +196,23 @@ export default new ChatInputCommand({
                 embeds: [new EmbedBuilder()
                     .setTitle("Convert help")
                     .setColor(app.config.embedColor)
-                    .setDescription("To convert something, you add **amount** and **unit** combinations to your starter(s). The syntax for an amount and unit combination is `[amount][unit symbol]`. Amount and unit combinations are called **arguments**. Arguments are divided into **starters** and a **target unit**. Starters are the starting values that you want to convert to the target unit. A conversion command can consist of one or more starters, separated with a comma (`,`) in case there are many. After starters comes the target unit as the second option. The target must not include an amount. It is just a **unit symbol**. Because you cannot convert fruits into lengths, all starters and the target unit must be of the same **quantity**, e.g. `1meter` to `centimeter`.")
+                    .setDescription(`
+                        • To convert something, you need a starter to convert *from* and a target to convert *to*.
+                        • Your starter should consist of an **amount** (number) and **unit** (name) combination, e.g. \`5lbs\` or \`3km\`.
+                        • Your target should consist of only a **unit** (name) - no amount - since the purpose of converting is to find the target's amount.
+                        • Because you cannot convert fruits into lengths, your starter and target unit must be of the same **quantity**, e.g. \`1meter\` to \`centimeter\` (a space conversion).
+                    `)
                     .addFields(
                         {
                             name: "Supported Quantities",
                             value: `${quantityKeys.map(formatString).join(", ")}\n\nTo learn more about a quantity and its units and unit symbols,\nuse \`/convert help\` with a specified quantity option.`
                         },
                         {
-                            name: "Examples",
+                            name: "Conversion Examples",
                             value: [
-                                "An amount: \"5\", \"1200300\", \"1.99\"",
-                                "A unit: metre, kelvin, Euro",
-                                "A unit symbol: \"fh\", \"cm^3\", \"$\", \"fl oz\"",
-                                "An argument: \"180cm\", \"12.99€\", \"5km\", \"16fl oz\"",
-                                "A target unit: \"km\", \"c\", \"m2\"",
-                                "Complete conversion examples:",
-                                "`/convert convert` `5ft, 8in` & `cm`",
+                                "`/convert convert` `5lbs` & `kg`",
                                 "`/convert convert` `300kelvin` & `celsius`",
-                                "`/convert convert` `57mm, 3.3cm, 0.4m` & `cm`"
+                                "`/convert convert` `57mm` & `ft`"
                             ].join("\n")
                         }
                     )
@@ -239,71 +222,65 @@ export default new ChatInputCommand({
             });
         }
 
-        const starters = options.getString("starter", true).split(",").map(starter => {
-            starter = starter.trim();
+        const starterPortion = options.getString("starter", true);
+        const stMtch = starterPortion.match(/[0-9,.-]*/gi)!;
+        const unitSymbol = starterPortion.slice(stMtch[0].length).trim();
+        const unit = findUnit(unitSymbol.endsWith("s") && unitSymbol.length > 3
+            ? unitSymbol.slice(0, unitSymbol.length - 1)
+            : unitSymbol
+        );
+        const starter = unit && { ...unit, amount: parseFloat(starterPortion) };
 
-            const stMtch = starter.match(/[0-9,.-]*/gi)!;
-            const unitSymbol = starter.slice(stMtch[0].length).trim();
-            const unit = findUnit(unitSymbol.endsWith("s") && unitSymbol.length > 3
-                ? unitSymbol.slice(0, unitSymbol.length - 1)
-                : unitSymbol
-            );
-
-            if (!unit) return;
-
-            return { ...unit, amount: parseFloat(starter) };
-        });
-
-        if (!areValidStarters(starters)) return await app.api.interactions.reply(interaction.id, interaction.token, {
-            content: "You must convert *something;* Your message has 0 starters.",
+        if (!starter) return await app.api.interactions.reply(interaction.id, interaction.token, {
+            content: "You must convert *something;* You didn't specify a (valid) starter unit",
             flags: app.ephemeral
         });
 
         const targetPortion = options.getString("target", true);
-        
         const target = findUnit(targetPortion.endsWith("s") && targetPortion.length > 3
             ? targetPortion.slice(0, targetPortion.length - 1)
             : targetPortion
         );
 
         if (!target) return await app.api.interactions.reply(interaction.id, interaction.token, {
-            content: "You must convert *to* something; Your message doesn't have a (valid) target unit.",
+            content: "You must convert *to* something; You didn't specify a (valid) target unit",
             flags: app.ephemeral
         });
 
         // Check that all starters and target are the same quantity
-        const usedQuantities = new Set([target.quantity, ...starters.map(x => x.quantity)]);
-        const numeratorQuantities = new Set([target.unit.numeratorQuantity, ...starters.map(x => x.unit.numeratorQuantity)]);
-        const denominatorQuantities = new Set([target.unit.denominatorQuantity, ...starters.map(x => x.unit.denominatorQuantity)]);
+        const usedQuantities = new Set([starter.quantity, target.quantity]);
 
-        if (
-            usedQuantities.size > 1
-            || numeratorQuantities.size > 1
-            || denominatorQuantities.size > 1
-        ) return await app.api.interactions.reply(interaction.id, interaction.token, {
-            content: `All starting units and the target unit must be of the same quantity; The quantities you used were \`${[...usedQuantities, ...numeratorQuantities, ...denominatorQuantities].filter(x => x)}\``,
+        if (usedQuantities.size > 1) return await app.api.interactions.reply(interaction.id, interaction.token, {
+            content: `The starting unit and target unit must be of the same quantity; The quantities you used were \`${[...usedQuantities].join("` & `")}\``,
             flags: app.ephemeral
         });
 
-        const quantity = [...usedQuantities][0];
+        const isCurrencyConversion = starter.quantity === "currency";
+        
+        if (isCurrencyConversion) quantities.currency = await fetchCurrencies();
+        
+        const valuesToConvert = {
+            starter: (isCurrencyConversion ? target : starter).unit.value,
+            target: (isCurrencyConversion ? starter : target).unit.value
+        };
 
-        // Get absolute value: sum of all starters (starter amount * starter unit value)
-        const absolute = areTempQuantities(starters)
-            ? starters.map(starter => starter.unit.tempMath.toBase(starter.amount)).reduce((a, b) => a + b, 0)
-            : starters.map(starter => (starter.amount ?? 0) * (starter.unit.value ?? 0)).reduce((a, b) => a + b, 0);
+        // Get absolute value: starter amount * starter unit value)
+        const absolute = starter.unit.tempMath
+            ? starter.unit.tempMath.toBase(starter.amount)
+            : starter.amount * valuesToConvert.starter;
 
         // Multiply absolute by the value of the target unit
         const amountInTarget = target.unit.tempMath
             ? target.unit.tempMath.toSelf(absolute)
-            : absolute / target.unit.value;
+            : absolute / valuesToConvert.target;
 
         // Display amount and target unit symbol
         return await app.api.interactions.reply(interaction.id, interaction.token, {
             embeds: [new EmbedBuilder()
-                .setTitle(`${formatString(quantity)} conversion`)
+                .setTitle(`${formatString(starter.quantity)} conversion`)
                 .setColor(app.config.embedColor)
                 .addFields(
-                    { name: "Starting amount", value: starters.map(x => `${x.amount.toLocaleString("en-US")} ${x.unit.short[0]}`).join(", "), inline: true },
+                    { name: "Starting amount", value: `${starter.amount.toLocaleString("en-US")} ${starter.unit.short[0]}`, inline: true },
                     { name: "Converted amount", value: amountInTarget.toLocaleString("en-US", { maximumFractionDigits: 2 }) + " " + target.unit.short[0], inline: true }
                 )
                 .toJSON()
