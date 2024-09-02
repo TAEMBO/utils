@@ -1,4 +1,4 @@
-import { type RESTPostAPIApplicationCommandsJSONBody, Routes } from "@discordjs/core/http-only";
+import { InteractionContextType, ApplicationIntegrationType, type RESTPostAPIApplicationCommandsJSONBody, Routes } from "@discordjs/core/http-only";
 import { REST } from "@discordjs/rest";
 import { readdir } from "node:fs/promises";
 import { join } from "node:path";
@@ -24,9 +24,9 @@ for (const folder of await readdir("commands")) {
         }
 
         commands.push({
-            ...commandFile.default.data.toJSON(),
-            integration_types: [1],
-            contexts: [0, 1, 2]
+            ...commandFile.default.data,
+            integration_types: [ApplicationIntegrationType.UserInstall],
+            contexts: [InteractionContextType.Guild, InteractionContextType.BotDM, InteractionContextType.PrivateChannel]
         });
     }
 }
