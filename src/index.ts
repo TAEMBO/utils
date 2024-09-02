@@ -6,7 +6,6 @@ import {
     type APIChatInputApplicationCommandInteraction,
     type APIContextMenuInteraction
 } from "@discordjs/core/http-only";
-import { ContextMenuCommandBuilder } from "@discordjs/builders";
 import { readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { InteractionOptionResolver } from "@sapphire/discord-utilities";
@@ -30,9 +29,9 @@ for (const folder of await readdir("commands")) {
             continue;
         }
 
-        const collectionType = commandFile.default.data instanceof ContextMenuCommandBuilder
-            ? "contextMenuCommands"
-            : "chatInputCommands";
+        const collectionType = commandFile.default.data.description
+            ? "chatInputCommands"
+            : "contextMenuCommands";
 
         app[collectionType].set(commandFile.default.data.name, commandFile.default);
     }
