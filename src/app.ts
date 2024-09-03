@@ -4,7 +4,7 @@ import { Collection } from "@discordjs/collection";
 import { EventEmitter } from "node:events";
 import Polka from "polka";
 import config from "#config" assert { type: "json" };
-import { ChatInputCommand, ContextMenuCommand } from "./structures/index.js";
+import type { ChatInputCommand, ContextMenuCommand } from "./structures/index.js";
 
 export default class App extends EventEmitter {
     public readonly config = config;

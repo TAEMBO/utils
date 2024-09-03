@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unsafe-declaration-merging */
 import { type APIInteraction, type APIMessageComponentInteraction, InteractionType } from "@discordjs/core/http-only";
 import { EventEmitter } from "node:events";
 import type App from "../app.js";
-import { CollectorOptions } from "#typings";
+import type { CollectorOptions } from "#typings";
 
 declare interface Collector {
     on(event: "collect", listener: (args: APIMessageComponentInteraction) => any): this;
