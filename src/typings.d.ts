@@ -1,5 +1,5 @@
+import type { APIMessageComponentInteraction, ApplicationIntegrationType } from "@discordjs/core/http-only";
 import type { SlashCommandBuilder, SlashCommandOptionsOnlyBuilder, SlashCommandSubcommandsOnlyBuilder } from "@discordjs/builders";
-import type { APIMessageComponentInteraction } from "@discordjs/core/http-only";
 
 export interface CollectorOptions {
     filter?: (int: APIMessageComponentInteraction) => boolean;
@@ -20,4 +20,5 @@ export interface ApplicationRPC {
     name: string;
     summary: string;
     tags?: string[];
+    integration_types_config?: Record<ApplicationIntegrationType, { oauth2_install_params: { scopes: string[], permissions: string } }>;
 }
