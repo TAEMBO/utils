@@ -16,7 +16,7 @@ export default new ChatInputCommand({
         const embed = new Builders.EmbedBuilder()
             .setTitle("__Eval__")
             .setColor(app.config.embedColor)
-            .addFields({ name: "Input", value: `\`\`\`js\n${code.slice(0, 1010)}\`\`\`` });
+            .addFields({ name: "Input", value: Builders.codeBlock(code.slice(0, 1010)) });
         const now = performance.now();
         let output;
 
@@ -29,7 +29,7 @@ export default new ChatInputCommand({
                 .setColor(16711680)
                 .addFields({
                     name: `Output • ${(performance.now() - now).toFixed(5)}ms`,
-                    value: `\`\`\`\n${err}\`\`\``
+                    value: Builders.codeBlock(err)
                 });
 
             await app.api.interactions.editReply(app.config.clientId, interaction.token, {
@@ -47,16 +47,19 @@ export default new ChatInputCommand({
                 max: 1,
                 timeout: 60_000
             })
-                .on("collect", int => app.api.interactions.reply(int.id, int.token, { content: `\`\`\`\n${err.stack.slice(0, 1950)}\`\`\``, flags: app.ephemeral }))
+                .on("collect", int => app.api.interactions.reply(int.id, int.token, {
+                    content: Builders.codeBlock(err.stack.slice(0, 1950)),
+                    flags: app.ephemeral
+                }))
                 .on("end", () => app.api.interactions.editReply(app.config.clientId, interaction.token, { components: [] }));
 
             return;
         }
 
         // Output manipulation
-        if (typeof output === "object") {
-            output = "js\n" + formatWithOptions({ depth }, "%O", output);
-        } else output = "\n" + String(output);
+        output = typeof output === "object"
+            ? "js\n" + formatWithOptions({ depth }, "%O", output)
+            : "\n" + String(output);
 
         embed.addFields({
             name: `Output • ${(performance.now() - now).toFixed(5)}ms`,
