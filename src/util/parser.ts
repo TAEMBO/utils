@@ -11,7 +11,7 @@ export async function parser(req: Request, _: Response, next: Next) {
 
         for await (const chunk of req) data += chunk;
 
-        (req as any).rawBody = data;
+        Object.defineProperty(req, "rawBody", { value: data });
         req.body = JSON.parse(data);
         
         return void next();
