@@ -7,6 +7,14 @@ export interface CollectorOptions {
     timeout?: number;
 }
 
+export interface IPInfoResult {
+    status: string;
+    description: string;
+    data?: {
+        geo: Record<string, string | number | null>;
+    };
+}
+
 export type CombinedSlashCommandBuilder = SlashCommandOptionsOnlyBuilder | SlashCommandSubcommandsOnlyBuilder;
 
 export interface ApplicationRPC {
