@@ -10,7 +10,7 @@ export default new ChatInputCommand({
 
         try {
             const data = await new REST().setToken(token.trim()).get(Routes.gatewayBot()) as RESTGetAPIGatewayBotResult;
-            const result = { ...data, id: Buffer.from(token.split(".")[0], "base64") };
+            const result = { ...data, id: Buffer.from(token.split(".")[0], "base64").toString() };
 
             await app.api.interactions.reply(interaction.id, interaction.token, {
                 content: codeBlock("js", formatWithOptions({ depth: 5 }, "%O", result).slice(0, 1990)),
