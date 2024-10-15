@@ -15,8 +15,8 @@ import { log, parser, verifyKey } from "#util";
 
 const app = new App();
 
-for (const folder of await readdir("commands")) {
-    for (const file of await readdir(join("commands", folder))) {
+for (const folder of await readdir(new URL("commands", import.meta.url))) {
+    for (const file of await readdir(new URL(join("commands", folder), import.meta.url))) {
         const commandPath = new URL(join("commands", folder, file), import.meta.url);
         const commandFile = await import(commandPath.toString());
 
