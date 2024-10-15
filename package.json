@@ -8,10 +8,10 @@
   "author": "TAEMBO",
   "scripts": {
     "lint": "eslint ./src",
-    "build": "npm run lint && tsc"
+    "build": "npm run lint && tsc",
+    "deploy": "node --env-file=.env ./dist/deployCommands.js"
   },
   "imports": {
-    "#config": "./dist/config.json",
     "#util": "./dist/util/index.js",
     "#structures": "./dist/structures/index.js"
   },

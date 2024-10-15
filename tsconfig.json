@@ -18,9 +18,9 @@
         "noImplicitAny": true,
         "noImplicitThis": true,
         "removeComments": true,
+        "rootDir": "./src",
         "outDir": "dist",
         "paths": {
-            "#config": ["src/config.json"],
             "#util": ["src/util/index.js"],
             "#structures": ["src/structures/index.js"],
             "#typings": ["src/typings.d.ts"]

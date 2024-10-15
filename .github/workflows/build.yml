@@ -17,12 +17,6 @@ jobs:
       - name: Installation
         run: npm ci
 
-      - name: Create config
-        run: | 
-          echo $CONFIG_JSON > ./src/config.json
-        env:
-          CONFIG_JSON: ${{ secrets.CONFIG_FILE }}
-
       - name: Lint
         run: npm run lint
 

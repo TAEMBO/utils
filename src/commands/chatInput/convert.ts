@@ -172,7 +172,7 @@ export default new ChatInputCommand({
                             This quantity comprises ${units.length} units.
                             Please use external sources for currency lists/names due to the amount comprised here being too large to display.
                         `)
-                        .setColor(app.config.embedColor).toJSON()
+                        .setColor(+process.env.EMBED_COLOR!).toJSON()
                     ],
                     flags: app.ephemeral
                 });
@@ -186,7 +186,7 @@ export default new ChatInputCommand({
                     embeds: [new EmbedBuilder()
                         .setTitle(`Convert help: ${chosenQuantity}`)
                         .setDescription(`This quantity comprises ${units.length} units, which are:\n\n${formattedUnits}`)
-                        .setColor(app.config.embedColor).toJSON()
+                        .setColor(+process.env.EMBED_COLOR!).toJSON()
                     ],
                     flags: app.ephemeral
                 });
@@ -195,7 +195,7 @@ export default new ChatInputCommand({
             return await app.api.interactions.reply(interaction.id, interaction.token, {
                 embeds: [new EmbedBuilder()
                     .setTitle("Convert help")
-                    .setColor(app.config.embedColor)
+                    .setColor(+process.env.EMBED_COLOR!)
                     .setDescription(`
                         • To convert something, you need a starter to convert *from* and a target to convert *to*.
                         • Your starter should consist of an **amount** (number) and **unit** (name) combination, e.g. \`5lbs\` or \`3km\`.
@@ -278,7 +278,7 @@ export default new ChatInputCommand({
         return await app.api.interactions.reply(interaction.id, interaction.token, {
             embeds: [new EmbedBuilder()
                 .setTitle(`${formatString(starter.quantity)} conversion`)
-                .setColor(app.config.embedColor)
+                .setColor(+process.env.EMBED_COLOR!)
                 .addFields(
                     { name: "Starting amount", value: `${starter.amount.toLocaleString("en-US")} ${starter.unit.short[0]}`, inline: true },
                     { name: "Converted amount", value: amountInTarget.toLocaleString("en-US", { maximumFractionDigits: 2 }) + " " + target.unit.short[0], inline: true }

@@ -15,7 +15,7 @@ export default new ChatInputCommand({
         const useAsync = Boolean(options.getBoolean("async", false));
         const embed = new Builders.EmbedBuilder()
             .setTitle("__Eval__")
-            .setColor(app.config.embedColor)
+            .setColor(+process.env.EMBED_COLOR!)
             .addFields({ name: "Input", value: Builders.codeBlock(code.slice(0, 1010)) });
         const now = performance.now();
         let output;
@@ -32,7 +32,7 @@ export default new ChatInputCommand({
                     value: Builders.codeBlock(err)
                 });
 
-            await app.api.interactions.editReply(app.config.clientId, interaction.token, {
+            await app.api.interactions.editReply(process.env.CLIENT_ID!, interaction.token, {
                 embeds: [embed.toJSON()],
                 components: [new Builders.ActionRowBuilder<Builders.ButtonBuilder>().addComponents(new Builders.ButtonBuilder()
                     .setCustomId("stack")
@@ -51,7 +51,7 @@ export default new ChatInputCommand({
                     content: Builders.codeBlock(err.stack.slice(0, 1950)),
                     flags: app.ephemeral
                 }))
-                .on("end", () => app.api.interactions.editReply(app.config.clientId, interaction.token, { components: [] }));
+                .on("end", () => app.api.interactions.editReply(process.env.CLIENT_ID!, interaction.token, { components: [] }));
 
             return;
         }
@@ -66,7 +66,7 @@ export default new ChatInputCommand({
             value: `\`\`\`${output.slice(0, 1016)}\n\`\`\``
         });
 
-        await app.api.interactions.editReply(app.config.clientId, interaction.token, { embeds: [embed.toJSON()] });
+        await app.api.interactions.editReply(process.env.CLIENT_ID!, interaction.token, { embeds: [embed.toJSON()] });
     },
     data: {
         name: "eval",

@@ -1,11 +1,7 @@
 import type { Next } from "polka";
 import type { Request, Response } from "express";
-import { TextEncoder } from "node:util";
 import { webcrypto } from "node:crypto";
-import config from "#config" assert { type: "json" };
-
-const { subtle } = webcrypto;
-const encoder = new TextEncoder();
+import { TextEncoder } from "node:util";
 
 function hexToBinary(hex: string) {
     const buf = new Uint8Array(Math.ceil(hex.length / 2));
@@ -17,7 +13,9 @@ function hexToBinary(hex: string) {
     return buf;
 }
 
-const key = await subtle.importKey("raw", hexToBinary(config.publicKey), "Ed25519", true, ["verify"]);
+const { subtle } = webcrypto;
+const encoder = new TextEncoder();
+const key = await subtle.importKey("raw", hexToBinary(process.env.PUBLIC_KEY!), "Ed25519", true, ["verify"]);
 
 export async function verifyKey(req: Request, res: Response, next: Next) {
     if (!req.headers["x-signature-ed25519"]) return res.writeHead(401).end();

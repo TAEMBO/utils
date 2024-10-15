@@ -95,6 +95,6 @@ app.server.use(parser, verifyKey).post("/", async (req, res) => {
             log("Yellow", "ModalSubmit not implemented");
             break;
     }
-}).listen(app.config.port, app.config.hostname, () => log("Blue", `Live on port \x1b[33m${app.config.port}\x1b[34m`));
+}).listen(+process.env.PORT!, process.env.HOSTNAME!, () => log("Blue", `Live on port \x1b[33m${process.env.PORT}\x1b[34m`));
 
 process.on("uncaughtException", console.log);

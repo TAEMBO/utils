@@ -7,7 +7,14 @@ import {
     ApplicationIntegrationType,
     ButtonStyle
 } from "@discordjs/core/http-only";
-import { ActionRowBuilder, ButtonBuilder, codeBlock, EmbedBuilder, roleMention, time } from "@discordjs/builders";
+import {
+    ActionRowBuilder,
+    ButtonBuilder,
+    codeBlock,
+    EmbedBuilder,
+    roleMention,
+    time
+} from "@discordjs/builders";
 import { formatWithOptions } from "node:util";
 import { ChatInputCommand } from "#structures";
 import { Collector, formatUser, getFlags, timeFromSnowflake } from "#util";
@@ -70,7 +77,7 @@ export default new ChatInputCommand({
                 value: `<t:${Math.round(timeFromSnowflake(user.id) / 1_000)}:R>`,
                 inline: true
             })
-            .setColor(app.config.embedColor)
+            .setColor(+process.env.EMBED_COLOR!)
             .setImage(user.banner ? app.api.rest.cdn.banner(user.id, user.banner, { extension: "png", size: 1024 }) : null);
 
         if (member) {
@@ -134,7 +141,7 @@ export default new ChatInputCommand({
                 embeds: []
             });
         }).on("end", async (ints) => {
-            if (!ints.length) await app.api.interactions.editReply(app.config.clientId, interaction.token, { components: [] });
+            if (!ints.length) await app.api.interactions.editReply(process.env.CLIENT_ID!, interaction.token, { components: [] });
         });
     },
     data: {

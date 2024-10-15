@@ -2,12 +2,11 @@ import { InteractionContextType, ApplicationIntegrationType, type RESTPostAPIApp
 import { REST } from "@discordjs/rest";
 import { readdir } from "node:fs/promises";
 import { join } from "node:path";
-import config from "#config" assert { type: "json" };
 import { ChatInputCommand, ContextMenuCommand } from "#structures";
 import { log } from "#util";
 
 const commands: RESTPostAPIApplicationCommandsJSONBody[] = [];
-const rest = new REST().setToken(config.token);
+const rest = new REST().setToken(process.env.TOKEN!);
 
 for (const folder of await readdir("commands")) {
     for (const file of await readdir(join("commands", folder))) {
@@ -31,6 +30,6 @@ for (const folder of await readdir("commands")) {
     }
 }
  
-await rest.put(Routes.applicationCommands(config.clientId), { body: commands })
+await rest.put(Routes.applicationCommands(process.env.CLIENT_ID!), { body: commands })
     .then(data => log("Purple", "Application commands registered", data))
     .catch(console.error);
