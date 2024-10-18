@@ -8,7 +8,7 @@
   "author": "TAEMBO",
   "scripts": {
     "lint": "eslint ./src",
-    "build": "npm run lint && tsc",
+    "build": "pnpm lint && tsc",
     "deploy": "node --env-file=.env ./dist/deployCommands.js"
   },
   "imports": {
