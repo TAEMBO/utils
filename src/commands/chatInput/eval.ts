@@ -3,7 +3,7 @@ import * as Builders from "@discordjs/builders";
 import { setTimeout as sleep } from "node:timers/promises";
 import { formatWithOptions } from "node:util";
 import { ChatInputCommand } from "#structures";
-import * as utils from "#util";
+import * as util from "#util";
 
 export default new ChatInputCommand({
     async run(app, interaction, options) {
@@ -14,21 +14,20 @@ export default new ChatInputCommand({
         const depth = options.getInteger("depth") ?? 1;
         const useAsync = Boolean(options.getBoolean("async", false));
         const embed = new Builders.EmbedBuilder()
-            .setTitle("__Eval__")
             .setColor(+process.env.EMBED_COLOR!)
-            .addFields({ name: "Input", value: Builders.codeBlock(code.slice(0, 1010)) });
+            .setDescription(Builders.codeBlock("js", code.slice(0, 1010)));
         const now = performance.now();
         let output;
 
         try {
             output = await eval(useAsync ? `(async () => { ${code} })()` : code);
         } catch (err: any) {
-            utils.log("Red", err);
+            util.log("Red", err);
             
             embed
                 .setColor(16711680)
                 .addFields({
-                    name: `Output • ${(performance.now() - now).toFixed(5)}ms`,
+                    name: (performance.now() - now).toFixed(5) + "ms",
                     value: Builders.codeBlock(err)
                 });
 
@@ -42,7 +41,7 @@ export default new ChatInputCommand({
                 flags: app.ephemeral
             });
 
-            new utils.Collector(app, {
+            new util.Collector(app, {
                 filter: int => (int.member ?? int).user!.id === (interaction.member ?? interaction).user!.id,
                 max: 1,
                 timeout: 60_000
@@ -57,13 +56,13 @@ export default new ChatInputCommand({
         }
 
         // Output manipulation
-        output = typeof output === "object"
-            ? "js\n" + formatWithOptions({ depth }, "%O", output)
-            : "\n" + String(output);
+        const formattedOutput = typeof output === "object"
+            ? formatWithOptions({ depth }, "%O", output)
+            : String(output);
 
         embed.addFields({
-            name: `Output • ${(performance.now() - now).toFixed(5)}ms`,
-            value: `\`\`\`${output.slice(0, 1016)}\n\`\`\``
+            name: (performance.now() - now).toFixed(5) + "ms • " + util.formatString(typeof output),
+            value: Builders.codeBlock("js", formattedOutput.slice(0, 1000))
         });
 
         await app.api.interactions.editReply(process.env.CLIENT_ID!, interaction.token, { embeds: [embed.toJSON()] });
