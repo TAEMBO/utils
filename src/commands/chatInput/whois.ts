@@ -5,19 +5,11 @@ import {
     UserFlags,
     type APIEmbedField,
     ApplicationIntegrationType,
-    ButtonStyle
 } from "@discordjs/core/http-only";
-import {
-    ActionRowBuilder,
-    ButtonBuilder,
-    codeBlock,
-    EmbedBuilder,
-    roleMention,
-    time
-} from "@discordjs/builders";
+import { codeBlock, EmbedBuilder, roleMention, time } from "@discordjs/builders";
 import { formatWithOptions } from "node:util";
 import { ChatInputCommand } from "#structures";
-import { Collector, formatUser, getFlags, timeFromSnowflake } from "#util";
+import { formatUser, getFlags, timeFromSnowflake } from "#util";
 import type { ApplicationRPC } from "#typings";
 
 export default new ChatInputCommand({
@@ -61,12 +53,28 @@ export default new ChatInputCommand({
         }
 
         const member = options.getMember("user");
+        const raw = Boolean(options.getBoolean("raw", false));
         const user = await app.api.users.get(options.getUser("user", true).id);
         const titlePrefix = user.bot
             ? "Bot"
             : member
                 ? "Member"
                 : "User";
+
+        if (raw) {
+            const rawMemberData = member && {
+                ...member,
+                user
+            };
+
+            await app.api.interactions.reply(interaction.id, interaction.token, {
+                content: codeBlock("js", formatWithOptions({ depth: 5 }, "%O", rawMemberData ?? user).slice(0, 1990)),
+                flags: app.ephemeral
+            });
+
+            return;
+        }
+
         const embed = new EmbedBuilder()
             .setThumbnail(user.avatar ? app.api.rest.cdn.avatar(user.id, user.avatar, { extension: "png", size: 1024 }) : null)
             .setTitle(`${titlePrefix} info: ${user.username}`)
@@ -117,31 +125,7 @@ export default new ChatInputCommand({
         
         await app.api.interactions.reply(interaction.id, interaction.token, {
             embeds: [embed.toJSON()],
-            components: [new ActionRowBuilder<ButtonBuilder>().addComponents(new ButtonBuilder()
-                .setCustomId("raw")
-                .setStyle(ButtonStyle.Primary)
-                .setLabel("Raw")
-            ).toJSON()],
             flags: app.ephemeral
-        });
-
-        new Collector(app, {
-            filter: int => (int.member ?? int).user!.id === (interaction.member ?? interaction).user!.id,
-            max: 1,
-            timeout: 20_000
-        }).on("collect", async int => {
-            const rawMemberData = member && {
-                ...member,
-                user
-            };
-
-            await app.api.interactions.updateMessage(int.id, int.token, {
-                content: codeBlock("js", formatWithOptions({ depth: 5 }, "%O", rawMemberData ?? user).slice(0, 1990)),
-                components: [],
-                embeds: []
-            });
-        }).on("end", async (ints) => {
-            if (!ints.length) await app.api.interactions.editReply(process.env.CLIENT_ID!, interaction.token, { components: [] });
         });
     },
     data: {
@@ -153,6 +137,12 @@ export default new ChatInputCommand({
                 name: "user",
                 description: "The user to get info on",
                 required: true
+            },
+            {
+                type: ApplicationCommandOptionType.Boolean,
+                name: "raw",
+                description: "Whether to show the raw data or not",
+                required: false
             }
         ]
     }
