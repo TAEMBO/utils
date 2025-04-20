@@ -9,6 +9,18 @@ export default new ChatInputCommand({
     async run(app, interaction, options) {
         await app.api.interactions.defer(interaction.id, interaction.token, { flags: app.ephemeral });
 
+        function editReply(data: Parameters<typeof app.api.interactions.editReply>[2]) {
+            return app.api.interactions.editReply(process.env.CLIENT_ID!, interaction.token, data);
+        }
+        function followUp(data: Parameters<typeof app.api.interactions.followUp>[2]) {
+            return app.api.interactions.followUp(process.env.CLIENT_ID!, interaction.token, data);
+        }
+        const get = app.api.rest.get.bind(app.api.rest);
+        const post = app.api.rest.post.bind(app.api.rest);
+        const put = app.api.rest.put.bind(app.api.rest);
+        const patch = app.api.rest.patch.bind(app.api.rest);
+        const del = app.api.rest.delete.bind(app.api.rest);
+
         sleep;
         const code = options.getString("code", true);
         const depth = options.getInteger("depth") ?? 1;
