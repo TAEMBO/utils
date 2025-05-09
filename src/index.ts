@@ -9,6 +9,7 @@ import {
 import { readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { InteractionOptionResolver } from "@sapphire/discord-utilities";
+import Polka from "polka";
 import App from "./app.js";
 import { ChatInputCommand, ContextMenuCommand } from "#structures";
 import { log, parser, verifyKey } from "#util";
@@ -37,64 +38,63 @@ for (const folder of await readdir(new URL("commands", import.meta.url))) {
     }
 }
 
-app.server.use(parser, verifyKey).post("/", async (req, res) => {
-    const interaction: APIInteraction = req.body;
+Polka()
+    .use(parser, verifyKey)
+    .post("/", async (req, res) => {
+        const interaction: APIInteraction = req.body;
 
-    app.emit("interaction", interaction);
+        app.emit("interaction", interaction);
 
-    switch (interaction.type) {
-        case InteractionType.Ping:
-            res
-                .setHeader("Content-Type", "application/json")
-                .writeHead(200)
-                .end(JSON.stringify({ type: InteractionResponseType.Pong }));
-            break;
-        case InteractionType.ApplicationCommand: {
-            const options = new InteractionOptionResolver(interaction);
+        switch (interaction.type) {
+            case InteractionType.Ping:
+                res
+                    .setHeader("Content-Type", "application/json")
+                    .writeHead(200)
+                    .end(JSON.stringify({ type: InteractionResponseType.Pong }));
+                break;
+            case InteractionType.ApplicationCommand: {
+                const options = new InteractionOptionResolver(interaction);
 
-            switch (interaction.data.type) {
-                case ApplicationCommandType.ChatInput: {
-                    const chatInputCmd = app.chatInputCommands.get(interaction.data.name);
+                switch (interaction.data.type) {
+                    case ApplicationCommandType.ChatInput: {
+                        const chatInputCmd = app.chatInputCommands.get(interaction.data.name);
                     
-                    if (!chatInputCmd) return log("Red", `Command ${interaction.data.name} not found`);
+                        if (!chatInputCmd) return log("Red", `Command ${interaction.data.name} not found`);
                     
-                    log("White", [
-                        `\x1b[32m${(interaction.member ?? interaction).user!.username}\x1b[37m used `,
-                        `/${interaction.data.name} ${options.getSubcommand(false) ?? ""}\x1b[37m in `,
-                        `#${interaction.channel?.name ?? interaction.channel.id}`
-                    ].join("\x1b[32m"));
+                        log("White", [
+                            `\x1b[32m${(interaction.member ?? interaction).user!.username}\x1b[37m used `,
+                            `/${interaction.data.name} ${options.getSubcommand(false) ?? ""}\x1b[37m in `,
+                            `#${interaction.channel?.name ?? interaction.channel.id}`
+                        ].join("\x1b[32m"));
     
-                    await chatInputCmd.run(app, interaction as APIChatInputApplicationCommandInteraction, options);
-                    break;
-                }
-                default: {
-                    const contextMenuCmd = app.contextMenuCommands.get(interaction.data.name);
+                        await chatInputCmd.run(app, interaction as APIChatInputApplicationCommandInteraction, options);
+                        break;
+                    }
+                    default: {
+                        const contextMenuCmd = app.contextMenuCommands.get(interaction.data.name);
                     
-                    if (!contextMenuCmd) return log("Red", `Command ${interaction.data.name} not found`);
+                        if (!contextMenuCmd) return log("Red", `Command ${interaction.data.name} not found`);
                     
-                    log("White", [
-                        `\x1b[32m${(interaction.member ?? interaction).user!.username}\x1b[37m used `,
-                        `${interaction.data.name}\x1b[37m in `,
-                        `#${interaction.channel.name ?? interaction.channel.id}`
-                    ].join("\x1b[32m"));
+                        log("White", [
+                            `\x1b[32m${(interaction.member ?? interaction).user!.username}\x1b[37m used `,
+                            `${interaction.data.name}\x1b[37m in `,
+                            `#${interaction.channel.name ?? interaction.channel.id}`
+                        ].join("\x1b[32m"));
     
-                    await contextMenuCmd.run(app, interaction as APIContextMenuInteraction, options);
-                    break;
+                        await contextMenuCmd.run(app, interaction as APIContextMenuInteraction, options);
+                        break;
+                    }
                 }
+
+                break;
             }
-
-            break;
+            default:
+                log("Yellow", `Interaction type ${interaction.type} not implemented`);
+                break;
         }
-        case InteractionType.MessageComponent:
-            log("Yellow", "MessageComponent not implemented");
-            break;
-        case InteractionType.ApplicationCommandAutocomplete:
-            log("Yellow", "ApplicationCommandAutocomplete not implemented");
-            break;
-        case InteractionType.ModalSubmit:
-            log("Yellow", "ModalSubmit not implemented");
-            break;
-    }
-}).listen(+process.env.PORT!, process.env.HOSTNAME!, () => log("Blue", `Live on port \x1b[33m${process.env.PORT}\x1b[34m`));
+    })
+    .listen(parseInt(process.env.PORT!, 10));
 
-process.on("uncaughtException", console.log);
+log("Blue", `Live on port \x1b[33m${process.env.PORT}\x1b[34m`);
+
+process.on("uncaughtException", console.error);
