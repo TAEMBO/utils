@@ -7,7 +7,7 @@ import type { IPInfoResult } from "#typings";
 
 export default new ChatInputCommand({
     async run(app, interaction, options) {
-        await app.api.interactions.defer(interaction.id, interaction.token);
+        await app.api.interactions.defer(interaction.id, interaction.token, { flags: app.ephemeral });
 
         const ip = options.getString("ip", true);
         const res = await fetch(process.env.IP_INFO_URL! + ip, { headers: { "User-Agent": process.env.IP_INFO_USER_AGENT! } });
