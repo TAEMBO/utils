@@ -7,6 +7,8 @@ import type { IPInfoResult } from "#typings";
 
 export default new ChatInputCommand({
     async run(app, interaction, options) {
+        await app.api.interactions.defer(interaction.id, interaction.token);
+
         const ip = options.getString("ip", true);
         const res = await fetch(process.env.IP_INFO_URL! + ip, { headers: { "User-Agent": process.env.IP_INFO_USER_AGENT! } });
         const result: IPInfoResult = await res.json();
@@ -14,7 +16,7 @@ export default new ChatInputCommand({
 
         if (result.data) content += "\n" + codeBlock("js", format("%O", result.data.geo).slice(0, 1990));
 
-        await app.api.interactions.reply(interaction.id, interaction.token, { content, flags: app.ephemeral });
+        await app.api.interactions.editReply(process.env.CLIENT_ID!, interaction.token, { content, flags: app.ephemeral });
     },
     data: {
         name: "ip",
