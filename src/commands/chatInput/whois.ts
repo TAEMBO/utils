@@ -89,28 +89,34 @@ export default new ChatInputCommand({
             .setImage(user.banner ? app.api.rest.cdn.banner(user.id, user.banner, { extension: "png", size: 1024 }) : null);
 
         if (member) {
-            embed.addFields(
-                {
-                    name: "🔹 Joined server",
-                    value: time(new Date(member.joined_at), "R"),
-                    inline: true
-                },
-                {
-                    name: `🔹 Roles: ${member.roles.length}`,
-                    value: member.roles.length
-                        ? member.roles
-                            .map(roleMention)
-                            .join(" ")
-                            .slice(0, 1024)
-                        : "None"
-                }
-            );
+            embed.addFields({
+                name: "🔹 Joined server",
+                value: time(new Date(member.joined_at), "R"),
+                inline: true
+            });
+
+            if (member.roles.length) embed.addFields({
+                name: `🔹 Roles: ${member.roles.length}`,
+                value: member.roles.map(roleMention).join(" ").slice(0, 1024)
+            });
 
             if (member.premium_since) embed.addFields({
                 name: "🔹 Server Boosting Since",
                 value: time(new Date(member.premium_since), "R"),
                 inline: true
             });
+
+            if (member.communication_disabled_until) {
+                const timeoutDate = new Date(member.communication_disabled_until);
+
+                if (timeoutDate.getTime() > Date.now()) {
+                    embed.addFields({
+                        name: "🔹 Timeout expires",
+                        value: time(timeoutDate, "R"),
+                        inline: true
+                    });
+                }
+            }
         }
 
         if (user.flags) embed.addFields({
