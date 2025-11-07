@@ -5,6 +5,7 @@ import {
     UserFlags,
     type APIEmbedField,
     ApplicationIntegrationType,
+    ImageFormat,
 } from "@discordjs/core/http-only";
 import { codeBlock, EmbedBuilder, roleMention, time } from "@discordjs/builders";
 import { formatWithOptions } from "node:util";
@@ -88,8 +89,18 @@ export default new ChatInputCommand({
             .setColor(+process.env.EMBED_COLOR!)
             .setImage(user.banner ? app.api.rest.cdn.banner(user.id, user.banner, { extension: "png", size: 1024 }) : null);
 
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        const { primary_guild } = user;
+
+        if (primary_guild?.badge && primary_guild.identity_guild_id && primary_guild.tag) {
+            embed.setFooter({
+                iconURL: app.api.rest.cdn.guildTagBadge(primary_guild.identity_guild_id, primary_guild.badge, { extension: ImageFormat.PNG }),
+                text: primary_guild.tag
+            });
+        }
+
         if (member) {
-            embed.addFields({
+            if (member.joined_at) embed.addFields({
                 name: "🔹 Joined server",
                 value: time(new Date(member.joined_at), "R"),
                 inline: true
