@@ -29,26 +29,26 @@ export default new ChatInputCommand({
             const fields: APIEmbedField[] = [];
 
             if (applicationData.description) fields.push({
-                name: "🔹 Bot description",
+                name: "Bot description",
                 value: applicationData.description
             });
 
             if (applicationData.tags?.length) fields.push({
-                name: "🔹 Bot tags",
+                name: "Bot tags",
                 value: applicationData.tags.join(", ")
             });
 
             if (applicationData.flags) fields.push({
-                name: "🔹 Bot flags",
+                name: "Bot flags",
                 value: getFlags(ApplicationFlags, applicationData.flags).join(", ")
             });
 
             if (applicationData.integration_types_config) fields.push({
-                name: "🔹Installation types",
+                name: "Installation types",
                 value: Object.keys(applicationData.integration_types_config).map(x => ApplicationIntegrationType[parseInt(x)]).join(", ")
             });
 
-            fields.push({ name: "🔹 Bot is public", value: applicationData.bot_public ? "Yes" : "No" });
+            fields.push({ name: "Bot is public", value: applicationData.bot_public ? "Yes" : "No" });
 
             return fields;
         }
@@ -82,7 +82,7 @@ export default new ChatInputCommand({
             .setURL(`https://discord.com/users/${user.id}`)
             .setDescription(formatUser(user))
             .addFields({
-                name: `🔹 ${user.bot ? "Bot" : "Account"} created`,
+                name: `${user.bot ? "Bot" : "Account"} created`,
                 value: `<t:${Math.round(timeFromSnowflake(user.id) / 1_000)}:R>`,
                 inline: true
             })
@@ -101,18 +101,18 @@ export default new ChatInputCommand({
 
         if (member) {
             if (member.joined_at) embed.addFields({
-                name: "🔹 Joined server",
+                name: "Joined server",
                 value: time(new Date(member.joined_at), "R"),
                 inline: true
             });
 
             if (member.roles.length) embed.addFields({
-                name: `🔹 Roles: ${member.roles.length}`,
+                name: `Roles: ${member.roles.length}`,
                 value: member.roles.map(roleMention).join(" ").slice(0, 1024)
             });
 
             if (member.premium_since) embed.addFields({
-                name: "🔹 Server Boosting Since",
+                name: "Server Boosting Since",
                 value: time(new Date(member.premium_since), "R"),
                 inline: true
             });
@@ -122,7 +122,7 @@ export default new ChatInputCommand({
 
                 if (timeoutDate.getTime() > Date.now()) {
                     embed.addFields({
-                        name: "🔹 Timeout expires",
+                        name: "Timeout expires",
                         value: time(timeoutDate, "R"),
                         inline: true
                     });
@@ -131,7 +131,7 @@ export default new ChatInputCommand({
         }
 
         if (user.flags) embed.addFields({
-            name: "🔹 Flags",
+            name: "Flags",
             value: getFlags(UserFlags, user.flags).join(", "),
             inline: true
         });
