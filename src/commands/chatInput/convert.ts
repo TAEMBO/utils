@@ -3,33 +3,33 @@ import { EmbedBuilder } from "@discordjs/builders";
 import { ChatInputCommand } from "#structures";
 import { formatString } from "#util";
 
-interface BaseQuantity {
+interface BaseUnit {
     readonly name: string;
     readonly short: string[];
     readonly value: number;
 }
 
-interface StandardQuantity extends BaseQuantity { 
+interface StandardUnit extends BaseUnit {
     readonly tempMath?: undefined;
 }
 
-interface TemperatureQuantity extends BaseQuantity {
+interface TemperatureUnit extends BaseUnit {
     readonly tempMath: {
         readonly toSelf: (absolute: number) => number;
         readonly toBase: (amount: number) => number;
     };
 }
 
-type Quantity = StandardQuantity | TemperatureQuantity;
+type Unit = StandardUnit | TemperatureUnit;
 
-const quantities: Record<string, Quantity[]> = {
+const quantities: Record<string, Unit[]> = {
     storage: [
-        { name: "bit", value: 1, short: ["bit", "bits"] },
+        { name: "bit", value: 1, short: ["bits"] },
         { name: "kilobit", value: 1_000, short: ["Kbit", "kilobits"] },
         { name: "megabit", value: 1_000_000, short: ["Mbit", "megabits"] },
         { name: "gigabit", value: 1_000_000_000, short: ["Gbit", "gigabits"] },
         { name: "terabit", value: 1_000_000_000_000, short: ["Tbit", "terabits"] },
-        { name: "byte", value: 8, short: ["byte", "bytes"] },
+        { name: "byte", value: 8, short: ["bytes"] },
         { name: "kilobyte", value: 8_000, short: ["KB", "kilobytes"] },
         { name: "megabyte", value: 8_000_000, short: ["MB", "megabytes"] },
         { name: "gigabyte", value: 8_000_000_000, short: ["GB", "gigabytes"] },
@@ -131,7 +131,11 @@ async function fetchCurrencies() {
 
     return Object.entries(currencyValues)
         .filter(x => currencyNames[x[0]])
-        .map(currency => ({ name: currencyNames[currency[0]], value: currency[1], short: [currency[0]] }));
+        .map(currency => ({
+            name: currencyNames[currency[0]],
+            value: currency[1],
+            short: [currency[0]]
+        }));
 }
 
 function findUnit(unitNameQuery: string) {
@@ -160,66 +164,32 @@ function findUnit(unitNameQuery: string) {
 export default new ChatInputCommand({
     async run(app, interaction, options) {
         if (options.getSubcommand() === "help") {
-            const chosenQuantity = options.getString("quantity", false);
+            const chosenQuantity = options.getString("quantity", true);
+            const units = quantities[chosenQuantity];
+            const embed = new EmbedBuilder()
+                .setTitle(`Convert help: ${chosenQuantity}`)
+                .setColor(+process.env.EMBED_COLOR!);
 
-            if (chosenQuantity) {
-                const units = quantities[chosenQuantity];
-
-                if (chosenQuantity === "currency") return await app.api.interactions.reply(interaction.id, interaction.token, {
-                    embeds: [new EmbedBuilder()
-                        .setTitle(`Convert help: ${chosenQuantity}`)
-                        .setDescription(`
-                            This quantity comprises ${units.length} units.
-                            Please use external sources for currency lists/names due to the amount comprised here being too large to display.
-                        `)
-                        .setColor(+process.env.EMBED_COLOR!).toJSON()
-                    ],
+            if (chosenQuantity === "currency") {
+                await app.api.interactions.reply(interaction.id, interaction.token, {
+                    embeds: [embed.setDescription(`This quantity comprises ${units.length} units.`).toJSON()],
                     flags: app.ephemeral
                 });
 
-                const formattedUnits = units
-                    .sort((a, b) => a.name.localeCompare(b.name))
-                    .map(unit => `**${formatString(unit.name)}** (${unit.short.map(x => `\`${x}\``).join(", ")})`)
-                    .join("\n");
-
-                return await app.api.interactions.reply(interaction.id, interaction.token, {
-                    embeds: [new EmbedBuilder()
-                        .setTitle(`Convert help: ${chosenQuantity}`)
-                        .setDescription(`This quantity comprises ${units.length} units, which are:\n\n${formattedUnits}`)
-                        .setColor(+process.env.EMBED_COLOR!).toJSON()
-                    ],
-                    flags: app.ephemeral
-                });
+                return;
             }
 
-            return await app.api.interactions.reply(interaction.id, interaction.token, {
-                embeds: [new EmbedBuilder()
-                    .setTitle("Convert help")
-                    .setColor(+process.env.EMBED_COLOR!)
-                    .setDescription(`
-                        • To convert something, you need a starter to convert *from* and a target to convert *to*.
-                        • Your starter should consist of an **amount** (number) and **unit** (name) combination, e.g. \`5lbs\` or \`3km\`.
-                        • Your target should consist of only a **unit** (name) - no amount - since the purpose of converting is to find the target's amount.
-                        • Because you cannot convert fruits into lengths, your starter and target unit must be of the same **quantity**, e.g. \`1meter\` to \`centimeter\` (a space conversion).
-                    `)
-                    .addFields(
-                        {
-                            name: "Supported Quantities",
-                            value: `${quantityKeys.map(formatString).join(", ")}\n\nTo learn more about a quantity and its units and unit symbols,\nuse \`/convert help\` with a specified quantity option.`
-                        },
-                        {
-                            name: "Conversion Examples",
-                            value: [
-                                "`/convert convert` `5lbs` & `kg`",
-                                "`/convert convert` `300kelvin` & `celsius`",
-                                "`/convert convert` `57mm` & `ft`"
-                            ].join("\n")
-                        }
-                    )
-                    .toJSON()
-                ],
+            const formattedUnits = units
+                .sort((a, b) => a.name.localeCompare(b.name))
+                .map(unit => `**${formatString(unit.name)}** (${unit.short.map(x => `\`${x}\``).join(", ")})`)
+                .join("\n");
+
+            await app.api.interactions.reply(interaction.id, interaction.token, {
+                embeds: [embed.setDescription(`This quantity comprises ${units.length} units, which are:\n\n${formattedUnits}`).toJSON()],
                 flags: app.ephemeral
             });
+
+            return;
         }
 
         const starterPortion = options.getString("starter", true);
@@ -231,7 +201,7 @@ export default new ChatInputCommand({
         );
         const starter = unit && { ...unit, amount: parseFloat(starterPortion) };
 
-        if (!starter) return await app.api.interactions.reply(interaction.id, interaction.token, {
+        if (!starter) return app.api.interactions.reply(interaction.id, interaction.token, {
             content: "You must convert *something;* You didn't specify a (valid) starter unit",
             flags: app.ephemeral
         });
@@ -242,7 +212,7 @@ export default new ChatInputCommand({
             : targetPortion
         );
 
-        if (!target) return await app.api.interactions.reply(interaction.id, interaction.token, {
+        if (!target) return app.api.interactions.reply(interaction.id, interaction.token, {
             content: "You must convert *to* something; You didn't specify a (valid) target unit",
             flags: app.ephemeral
         });
@@ -250,7 +220,7 @@ export default new ChatInputCommand({
         // Check that all starters and target are the same quantity
         const usedQuantities = new Set([starter.quantity, target.quantity]);
 
-        if (usedQuantities.size > 1) return await app.api.interactions.reply(interaction.id, interaction.token, {
+        if (usedQuantities.size > 1) return app.api.interactions.reply(interaction.id, interaction.token, {
             content: `The starting unit and target unit must be of the same quantity; The quantities you used were \`${[...usedQuantities].join("` & `")}\``,
             flags: app.ephemeral
         });
@@ -275,13 +245,21 @@ export default new ChatInputCommand({
             : absolute / valuesToConvert.target;
 
         // Display amount and target unit symbol
-        return await app.api.interactions.reply(interaction.id, interaction.token, {
+        await app.api.interactions.reply(interaction.id, interaction.token, {
             embeds: [new EmbedBuilder()
                 .setTitle(`${formatString(starter.quantity)} conversion`)
                 .setColor(+process.env.EMBED_COLOR!)
                 .addFields(
-                    { name: "Starting amount", value: `${starter.amount.toLocaleString("en-US")} ${starter.unit.short[0]}`, inline: true },
-                    { name: "Converted amount", value: amountInTarget.toLocaleString("en-US", { maximumFractionDigits: 2 }) + " " + target.unit.short[0], inline: true }
+                    {
+                        name: "Starting amount",
+                        value: `${starter.amount.toLocaleString("en-US")} ${starter.unit.short[0]}`,
+                        inline: true
+                    },
+                    {
+                        name: "Converted amount",
+                        value: `${amountInTarget.toLocaleString("en-US", { maximumFractionDigits: 2 })} ${target.unit.short[0]}`,
+                        inline: true
+                    }
                 )
                 .toJSON()
             ],
@@ -302,7 +280,7 @@ export default new ChatInputCommand({
                         name: "quantity",
                         description: "The quantity to get info on",
                         choices: quantityKeys.map(x => ({ name: formatString(x), value: x })),
-                        required: false
+                        required: true
                     }
                 ]
             },
